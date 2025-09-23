@@ -48,3 +48,25 @@ provided in `App.jsx`.
 
 The project is set up to use `react-query` for managing queries, mutations, and query
 data. The query client and query client provider are in use in `App.jsx`.
+
+## Backend
+
+### Setup
+
+- Install the dependencies at the project top level
+ 
+  ```bash
+  poetry install
+  ```
+
+
+### Development
+
+Start the backend server at the project top level
+
+```bash
+poetry run uvicorn backend:app --reload  
+```
+
+
+
