@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "pony-express"
+version = "0.1.0"
+description = "Web API for PonyExpress messaging application"
+authors = [ "cynthia_lancaster u1300630@umail.utah.edu" ]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.115.6"
+fastapi-cli = "^0.0.7"
+python-multipart = "^0.0.20"
+pydantic-settings = "^2.7.1"
+sqlmodel = "^0.0.22"
+uvicorn = "^0.34.0"
+bcrypt = "^4.2.1"
+cryptography = "^44.0.0"
+python-jose = "^3.3.0"
+mangum = "^0.19.0"
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^8.31.0"
+pytest = "^8.3.4"
+httpx = "^0.28.1"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+

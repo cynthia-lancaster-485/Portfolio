@@ -1,0 +1,10 @@
+fastapi==0.115.6
+fastapi-cli==0.0.7
+python-multipart==0.0.20
+pydantic-settings==2.7.1
+sqlmodel==0.0.22
+uvicorn==0.34.0
+bcrypt==4.2.1
+cryptography==44.0.0
+python-jose==3.3.0
+mangum==0.19.0
