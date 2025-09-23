@@ -51,6 +51,14 @@ data. The query client and query client provider are in use in `App.jsx`.
 
 ## Backend
 
+The backend of the application is written in Python using FastAPI framework
+
+- [FastAPI](https://fastapi.tiangolo.com)
+- [sqlmodel](https://sqlmodel.tiangolo.com)
+- [CORS](https://fastapi.tiangolo.com/tutorial/cors)
+
+
+
 ### Setup
 
 - Install the dependencies at the project top level
