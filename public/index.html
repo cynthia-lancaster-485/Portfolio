@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Name — UX/UI Designer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --lime: #C8F135;
+      --lime-dark: #9DC418;
+      --ink: #1A1A18;
+      --paper: #F5F2EB;
+      --muted: #7A7A72;
+      --card-bg: #FFFFFF;
+      --tag-bg: #EEEADF;
+      --border: rgba(26,26,24,0.12);
+      --radius: 20px;
+      --radius-sm: 10px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 3rem;
+      background: var(--paper);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+    }
+
+    .nav-logo {
+      font-family: 'Fraunces', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 400;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+
+    .nav-cta {
+      background: var(--ink);
+      color: var(--lime) !important;
+      padding: 0.5rem 1.25rem;
+      border-radius: 100px;
+      font-weight: 500 !important;
+      transition: transform 0.2s, background 0.2s !important;
+    }
+    .nav-cta:hover { background: #333 !important; transform: scale(1.03); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 3rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-blob {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: var(--lime);
+      border-radius: 50% 30% 60% 40% / 40% 60% 30% 50%;
+      top: -100px;
+      right: -100px;
+      opacity: 0.35;
+      animation: blobFloat 8s ease-in-out infinite;
+      z-index: 0;
+    }
+
+    @keyframes blobFloat {
+      0%, 100% { border-radius: 50% 30% 60% 40% / 40% 60% 30% 50%; transform: translateY(0); }
+      50% { border-radius: 30% 60% 40% 60% / 60% 40% 60% 30%; transform: translateY(-20px); }
+    }
+
+    .hero-eyebrow {
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      position: relative; z-index: 1;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 32px; height: 2px;
+      background: var(--lime-dark);
+    }
+
+    .hero-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      margin-bottom: 2rem;
+      position: relative; z-index: 1;
+      max-width: 900px;
+    }
+
+    .hero-title .italic {
+      font-style: italic;
+      color: var(--lime-dark);
+    }
+
+    .hero-desc {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+      position: relative; z-index: 1;
+    }
+
+    .hero-actions {
+      display: flex; gap: 1rem; align-items: center;
+      position: relative; z-index: 1;
+    }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--ink);
+      color: var(--lime);
+      padding: 0.85rem 2rem;
+      border-radius: 100px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      color: var(--ink);
+      padding: 0.85rem 2rem;
+      border-radius: 100px;
+      text-decoration: none;
+      font-weight: 400;
+      font-size: 0.95rem;
+      border: 1.5px solid var(--border);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--ink); background: rgba(26,26,24,0.04); }
+
+    .hero-stats {
+      position: absolute;
+      bottom: 4rem;
+      right: 3rem;
+      display: flex;
+      gap: 3rem;
+      z-index: 1;
+    }
+    .stat-item { text-align: right; }
+    .stat-num {
+      font-family: 'Fraunces', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--ink);
+    }
+    .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+
+    /* ── SECTIONS ── */
+    section { padding: 6rem 3rem; }
+
+    .section-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .section-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 3rem;
+    }
+
+    /* ── PROJECTS GRID ── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+    }
+
+    .project-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .project-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    }
+
+    .project-card.large { grid-column: span 7; }
+    .project-card.medium { grid-column: span 5; }
+    .project-card.full { grid-column: span 12; }
+    .project-card.half { grid-column: span 6; }
+
+    .project-thumb {
+      width: 100%;
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-thumb.landscape { aspect-ratio: 16/9; }
+    .project-thumb.portrait { aspect-ratio: 3/4; }
+
+    .project-thumb .mock-screen {
+      width: 70%;
+      height: 80%;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    .thumb-a { background: linear-gradient(135deg, #6B4DE6 0%, #A855F7 100%); }
+    .thumb-b { background: linear-gradient(135deg, #F97316 0%, #FBBF24 100%); }
+    .thumb-c { background: linear-gradient(135deg, #0EA5E9 0%, #2DD4BF 100%); }
+    .thumb-d { background: linear-gradient(135deg, #EC4899 0%, #F43F5E 100%); }
+    .thumb-e { background: linear-gradient(135deg, #10B981 0%, #34D399 100%); }
+
+    .project-info {
+      padding: 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .project-tags {
+      display: flex; gap: 0.5rem; flex-wrap: wrap;
+    }
+
+    .tag {
+      background: var(--tag-bg);
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.75rem;
+      border-radius: 100px;
+    }
+
+    .project-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .project-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .project-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-top: 0.5rem;
+    }
+
+    .project-link .arrow {
+      width: 20px; height: 20px;
+      background: var(--lime);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      transition: transform 0.2s;
+    }
+
+    .project-card:hover .arrow { transform: translate(2px, -2px); }
+
+    /* ── ABOUT ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .about-visual {
+      position: relative;
+      height: 480px;
+    }
+
+    .about-blob-card {
+      position: absolute;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+
+    .about-main-card {
+      width: 280px;
+      top: 0; left: 0;
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .about-main-card .big-emoji { font-size: 3rem; margin-bottom: 1rem; }
+    .about-main-card h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+    .about-main-card p { font-size: 0.85rem; opacity: 0.6; }
+
+    .about-skill-card {
+      width: 200px;
+      bottom: 60px; right: 0;
+      animation: floatCard 5s ease-in-out infinite;
+    }
+
+    .about-tool-card {
+      width: 180px;
+      top: 200px; left: 220px;
+      animation: floatCard 6s ease-in-out infinite reverse;
+    }
+
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .skill-list { list-style: none; }
+    .skill-list li {
+      font-size: 0.82rem;
+      padding: 0.3rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .skill-list li:last-child { border: none; }
+    .skill-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--lime-dark);
+    }
+
+    .about-text h2 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+    }
+
+    .about-text p {
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+
+    .tools-row {
+      display: flex; gap: 0.75rem; flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    .tool-chip {
+      background: var(--lime);
+      color: var(--ink);
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.4rem 1rem;
+      border-radius: 100px;
+    }
+
+    /* ── CONTACT ── */
+    .contact-section {
+      background: var(--ink);
+      color: #fff;
+      border-radius: var(--radius) var(--radius) 0 0;
+      margin: 0;
+      padding: 6rem 3rem;
+    }
+
+    .contact-section .section-label { color: rgba(255,255,255,0.4); }
+    .contact-section .section-label::after { background: rgba(255,255,255,0.1); }
+
+    .contact-headline {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-headline .accent { color: var(--lime); font-style: italic; }
+
+    .contact-sub {
+      color: rgba(255,255,255,0.5);
+      font-size: 1.05rem;
+      margin-bottom: 3rem;
+      max-width: 440px;
+    }
+
+    .contact-links {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.75rem;
+      border-radius: 100px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: transform 0.2s;
+    }
+
+    .contact-link:hover { transform: translateY(-2px); }
+
+    .contact-link.primary {
+      background: var(--lime);
+      color: var(--ink);
+    }
+
+    .contact-link.outline {
+      border: 1.5px solid rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    .contact-link.outline:hover { border-color: rgba(255,255,255,0.6); }
+
+    footer {
+      background: var(--ink);
+      color: rgba(255,255,255,0.3);
+      text-align: center;
+      padding: 2rem 3rem;
+      font-size: 0.8rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .hero { padding: 7rem 1.5rem 4rem; }
+      .hero-stats { position: static; margin-top: 3rem; justify-content: flex-start; }
+      section { padding: 4rem 1.5rem; }
+      .project-card.large,
+      .project-card.medium,
+      .project-card.half { grid-column: span 12; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-visual { display: none; }
+      .contact-section { padding: 4rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">Your Name.</a>
+    <ul class="nav-links">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact" class="nav-cta">Let's talk →</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-blob"></div>
+    <p class="hero-eyebrow">UX / UI Designer · Open to work</p>
+    <h1 class="hero-title">
+      Crafting <span class="italic">delightful</span><br>
+      digital experiences
+    </h1>
+    <p class="hero-desc">
+      I'm a UX/UI designer who loves turning complex problems into
+      intuitive, joyful products. From mobile apps to full design systems —
+      I make things people actually enjoy using.
+    </p>
+    <div class="hero-actions">
+      <a href="#work" class="btn-primary">See my work ↓</a>
+      <a href="#contact" class="btn-secondary">Say hello</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">8+</div>
+        <div class="stat-label">Projects shipped</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Case studies</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section id="work">
+    <p class="section-label">Selected work</p>
+    <h2 class="section-title">Projects I'm proud of</h2>
+
+    <div class="projects-grid">
+
+      <!-- Card 1 — Large -->
+      <a href="#" class="project-card large">
+        <div class="project-thumb thumb-a">
+          <div class="mock-screen">📱</div>
+        </div>
+        <div class="project-info">
+          <div class="project-tags">
+            <span class="tag">Mobile App</span>
+            <span class="tag">Case Study</span>
+          </div>
+          <h3 class="project-title">Wellness Tracker — Habit &amp; Mood App</h3>
+          <p class="project-desc">End-to-end design of a mental wellness app. User research, journey mapping, wireframes, and a final polished UI system with accessibility baked in.</p>
+          <span class="project-link">View case study <span class="arrow">↗</span></span>
+        </div>
+      </a>
+
+      <!-- Card 2 — Medium -->
+      <a href="#" class="project-card medium">
+        <div class="project-thumb thumb-b landscape">
+          <div class="mock-screen">🌐</div>
+        </div>
+        <div class="project-info">
+          <div class="project-tags">
+            <span class="tag">Web / Desktop</span>
+          </div>
+          <h3 class="project-title">SaaS Dashboard Redesign</h3>
+          <p class="project-desc">Redesigned a cluttered analytics platform into a clean, scannable dashboard that cut user confusion by 40%.</p>
+          <span class="project-link">View project <span class="arrow">↗</span></span>
+        </div>
+      </a>
+
+      <!-- Card 3 — Half -->
+      <a href="#" class="project-card half">
+        <div class="project-thumb thumb-c">
+          <div class="mock-screen">🎨</div>
+        </div>
+        <div class="project-info">
+          <div class="project-tags">
+            <span class="tag">Web / Desktop</span>
+            <span class="tag">Prototype</span>
+          </div>
+          <h3 class="project-title">E-Commerce Checkout Flow</h3>
+          <p class="project-desc">Reduced cart abandonment with a streamlined 3-step checkout. Prototyped and usability-tested with 12 participants.</p>
+          <span class="project-link">View prototype <span class="arrow">↗</span></span>
+        </div>
+      </a>
+
+      <!-- Card 4 — Half -->
+      <a href="#" class="project-card half">
+        <div class="project-thumb thumb-d">
+          <div class="mock-screen">📊</div>
+        </div>
+        <div class="project-info">
+          <div class="project-tags">
+            <span class="tag">Mobile App</span>
+          </div>
+          <h3 class="project-title">Fintech Onboarding Experience</h3>
+          <p class="project-desc">Designed a trust-first onboarding for a fintech startup — reducing drop-off from 65% to 28% in testing.</p>
+          <span class="project-link">View project <span class="arrow">↗</span></span>
+        </div>
+      </a>
+
+      <!-- Card 5 — Full -->
+      <a href="#" class="project-card full">
+        <div style="display:grid; grid-template-columns: 1fr 1fr;">
+          <div class="project-thumb thumb-e landscape" style="border-radius: 0; height: 260px;">
+            <div class="mock-screen">🧩</div>
+          </div>
+          <div class="project-info" style="padding: 2.5rem;">
+            <div class="project-tags">
+              <span class="tag">Case Study</span>
+              <span class="tag">Prototype</span>
+            </div>
+            <h3 class="project-title" style="font-size: 1.7rem;">Task Management App — Full Case Study</h3>
+            <p class="project-desc">From problem discovery through to a fully interactive Figma prototype. Includes competitive analysis, user interviews, 3 rounds of iteration, and a handoff-ready component library.</p>
+            <span class="project-link" style="margin-top: 1rem;">Read full case study <span class="arrow">↗</span></span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" style="background: var(--card-bg);">
+    <p class="section-label">About me</p>
+    <div class="about-grid">
+
+      <div class="about-visual" aria-hidden="true">
+        <div class="about-blob-card about-main-card">
+          <div class="big-emoji">👋</div>
+          <h3>Hey, I'm [Your Name]!</h3>
+          <p>Designer, problem-solver,<br>occasional over-thinker</p>
+        </div>
+        <div class="about-blob-card about-skill-card">
+          <p style="font-size:0.7rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:0.75rem;">My toolkit</p>
+          <ul class="skill-list">
+            <li><span class="skill-dot"></span>Figma</li>
+            <li><span class="skill-dot"></span>Prototyping</li>
+            <li><span class="skill-dot"></span>User research</li>
+            <li><span class="skill-dot"></span>Wireframing</li>
+          </ul>
+        </div>
+        <div class="about-blob-card about-tool-card">
+          <p style="font-size: 0.72rem; color: var(--muted); margin-bottom: 0.5rem;">Currently vibing with</p>
+          <p style="font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700;">Design systems<br>&amp; accessibility ✨</p>
+        </div>
+      </div>
+
+      <div class="about-text">
+        <h2>A designer who cares about the <em>why</em> as much as the <em>what</em></h2>
+        <p>
+          I recently graduated with a degree in UX/UI Design and I'm on the lookout
+          for my first full-time role. I believe great design isn't just pretty —
+          it solves real problems for real people.
+        </p>
+        <p>
+          I love the messy, human part of design: the interviews, the "aha" moments,
+          the 12th iteration that finally just <em>works</em>. My process is research-led,
+          collaborative, and always centered on the person using the product.
+        </p>
+        <p>
+          When I'm not pushing pixels, you'll find me sketching in coffee shops,
+          obsessing over typography, or rewatching design conference talks.
+        </p>
+        <div class="tools-row">
+          <span class="tool-chip">Figma</span>
+          <span class="tool-chip">FigJam</span>
+          <span class="tool-chip">Maze</span>
+          <span class="tool-chip">Notion</span>
+          <span class="tool-chip">HTML / CSS</span>
+          <span class="tool-chip">Accessibility</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact-section" id="contact">
+    <p class="section-label">Get in touch</p>
+    <h2 class="contact-headline">
+      Let's make<br>something <span class="accent">fun.</span>
+    </h2>
+    <p class="contact-sub">
+      I'm actively looking for junior UX/UI design roles. If you think I'd be a good fit
+      for your team, I'd love to chat!
+    </p>
+    <div class="contact-links">
+      <a href="mailto:you@email.com" class="contact-link primary">✉️ Email me</a>
+      <a href="https://linkedin.com/in/yourprofile" class="contact-link outline" target="_blank">LinkedIn →</a>
+      <a href="https://drive.google.com/your-resume" class="contact-link outline" target="_blank">Download résumé →</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>Designed &amp; built by [Your Name] · Hosted on GitLab Pages · 2025</p>
+  </footer>
+
+</body>
+</html>
