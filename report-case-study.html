@@ -192,24 +192,6 @@
     /* DIVIDER */
     .full-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
 
-     .runner-ui {
-    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-    }
-    .form-check-input:checked {
-      background-color: #0d6efd;
-      border-color: #0d6efd;
-    }
-    .table th {
-      background-color: white;
-      font-weight: 600;
-      font-size: 0.875rem;
-    }
-    .card {
-      border: 1px solid #dee2e6;
-      border-radius: 0.5rem;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    }
-
     @media (max-width: 900px) {
       nav { padding: 1rem 1.5rem; }
       .case-hero, .case-section { padding: 3rem 1.5rem; }
@@ -471,242 +453,85 @@
       </div>
 
       <!-- After Page 2: Runner -->
-    <div id="after-runner" class="runner-ui" style="display:none;">
-      <div class="container-fluid p-4">
-        <!-- Breadcrumb navigation -->
-        <div class="row mb-4">
-          <div class="col">
-            <div style="display: flex; align-items: center; gap: 8px; color: #6c757d;">
-              <div style="display: flex; align-items: center; cursor: pointer;" onclick="switchAfterPage('groups')">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
-                  <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-                </svg>
-                <span>Dashboard</span>
+      <div id="after-runner" class="runner-ui" style="display:none;">
+        <div class="runner-header">
+          <div style="display:flex; align-items:center; gap:6px; color:#9ca3af; font-size:12px; margin-bottom:0.75rem; cursor:pointer;" onclick="switchAfterPage('groups')">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+            My Reports
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:0.75rem;">
+            <h2 style="font-size:1.1rem; font-weight:700; color:#111827;">New Report Configuration</h2>
+          </div>
+        </div>
+        <div class="runner-period-bar">
+          <span class="period-label">Report Period</span>
+          <div class="period-selects">
+            <select><option>May</option><option>April</option><option>March</option></select>
+            <select><option>2025</option><option>2024</option><option>2023</option></select>
+          </div>
+        </div>
+        <div class="runner-body">
+          <div class="runner-col">
+            <div class="runner-col-header">
+              <h5>Reports</h5>
+              <input type="text" placeholder="Search...">
+            </div>
+            <div class="runner-list" id="report-list">
+              <div class="runner-report-row" onclick="toggleReport(this, 'Financial Ratios B1-B10')">
+                <span>Financial Ratios B1-B10</span>
+                <button class="runner-add-btn">+</button>
               </div>
-              <span>/</span>
-              <div onclick="switchAfterPage('groups')" style="cursor: pointer;">My Reports</div>
-              <span>/</span>
-              <div style="color: #0d6efd;">New Report Configuration</div>
+              <div class="runner-report-row" onclick="toggleReport(this, 'Balance Sheet Summary')">
+                <span>Balance Sheet Summary</span>
+                <button class="runner-add-btn">+</button>
+              </div>
+              <div class="runner-report-row" onclick="toggleReport(this, 'Income Statement')">
+                <span>Income Statement</span>
+                <button class="runner-add-btn">+</button>
+              </div>
+              <div class="runner-report-row" onclick="toggleReport(this, 'Cash Flow Report')">
+                <span>Cash Flow Report</span>
+                <button class="runner-add-btn">+</button>
+              </div>
+              <div class="runner-report-row" onclick="toggleReport(this, 'Loan Ledger')">
+                <span>Loan Ledger</span>
+                <button class="runner-add-btn">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="runner-col">
+            <div class="runner-col-header">
+              <h5>Companies</h5>
+            </div>
+            <div class="company-search-bar">
+              <select><option>Report Name</option><option>Last Name</option><option>Ccode</option></select>
+              <input type="text" placeholder="Search companies...">
+            </div>
+            <div class="runner-list">
+              <table class="company-mini-table">
+                <thead><tr><th>Add</th><th>Name</th><th>Type</th><th>Code</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td><button class="runner-add-btn" onclick="addCompany(this, 'ABC Corporation')">+</button></td><td>ABC Corporation</td><td>LLC</td><td>ABC001</td><td>Active</td></tr>
+                  <tr><td><button class="runner-add-btn" onclick="addCompany(this, 'XYZ Enterprises')">+</button></td><td>XYZ Enterprises</td><td>Corp</td><td>XYZ002</td><td>Active</td></tr>
+                  <tr><td><button class="runner-add-btn" onclick="addCompany(this, 'Smith Consulting')">+</button></td><td>Smith Consulting</td><td>Sole</td><td>SMC003</td><td>Active</td></tr>
+                  <tr><td><button class="runner-add-btn" onclick="addCompany(this, 'Johnson &amp; Sons')">+</button></td><td>Johnson &amp; Sons</td><td>Part</td><td>JNS004</td><td>Active</td></tr>
+                  <tr><td><button class="runner-add-btn" onclick="addCompany(this, 'Williams Group')">+</button></td><td>Williams Group</td><td>LLC</td><td>WLG005</td><td>Active</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="runner-col">
+            <div class="runner-col-header"><h5>Selected (<span id="sel-count">0</span>)</h5></div>
+            <div id="selected-list" style="padding:0.5rem 0; min-height:80px;">
+              <p style="font-size:0.75rem; color:#9ca3af; text-align:center; padding:1.5rem 1rem;">Add reports &amp; companies to get started</p>
             </div>
           </div>
         </div>
-
-        <!-- Action Bar with Report Name and Buttons -->
-        <div class="row align-items-center mb-4">
-          <div class="col-6">
-            <input type="text" class="form-control" id="reportName" placeholder="Report Name" aria-label="ReportName">
-          </div>
-          <div class="col-6 text-end">
-            <button class="btn btn-outline-secondary me-2" onclick="saveUserReport()">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
-                <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v4.5h2a.5.5 0 0 1 .354.854l-2.5 2.5a.5.5 0 0 1-.708 0l-2.5-2.5A.5.5 0 0 1 5.5 6.5h2V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z"/>
-              </svg>
-              Save
-            </button>
-            <button class="btn btn-primary me-2" onclick="runReports('pdf')">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
-                <path d="M5.523 12.424c.14-.082.293-.162.459-.238a7.878 7.878 0 0 0-.45.606c-.28.337-.498.645-.732 1.002a.5.5 0 0 0 .234.81c.284.114.568.19.85.238l.01.003c.216.03.432.046.648.048.41.003.819-.024 1.226-.08a6.005 6.005 0 0 0 1.005-.212 1 1 0 0 0 .106-.034c.25-.085.496-.18.735-.285a.5.5 0 0 0-.256-.944c-.209.056-.42.105-.632.146a6.7 6.7 0 0 1-1.008.108c-.344.008-.687-.02-1.028-.05a4.85 4.85 0 0 1-.774-.14l-.026-.006c-.17-.039-.336-.086-.496-.139a.5.5 0 0 1-.204-.305c.102-.197.218-.39.345-.57a2.3 2.3 0 0 1 .147-.176zM1 0a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1H1zm8.862 7.125c0 .408-.018.815-.053 1.22-.035.405-.094.805-.177 1.2a5.4 5.4 0 0 1-.342 1.075c-.142.33-.313.642-.513.935a.5.5 0 0 1-.445.222l-2.5-.5a.5.5 0 0 1-.378-.378l-.5-2.5a.5.5 0 0 1 .18-.5l3-2.5a.5.5 0 0 1 .663.019c.153.138.272.302.357.486.085.184.13.38.136.58z"/>
-              </svg>
-              PDF
-            </button>
-            <button class="btn btn-success" onclick="runReports('xlsx')">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
-                <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm3.5 4c-.276 0-.5.224-.5.5v5c0 .276.224.5.5.5h9c.276 0 .5-.224.5-.5v-5c0-.276-.224-.5-.5-.5h-9z"/>
-              </svg>
-              Excel
-            </button>
-          </div>
-        </div>
-
-        <!-- Main Content - 3 columns -->
-        <div class="row">
-          <!-- Left Column: Reports -->
-          <div class="col-4">
-            <div class="mb-3">
-              <h5 class="fw-bold d-flex align-items-center">
-                Reports
-                <button class="btn p-0 ms-2" onclick="createReport()">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                  </svg>
-                </button>
-              </h5>
-            </div>
-            <div class="card" style="height: 600px;">
-              <div class="card-body">
-                <div class="input-group mb-3">
-                  <span class="input-group-text">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                    </svg>
-                  </span>
-                  <input type="text" class="form-control" placeholder="Search by report title" id="reportSearch">
-                </div>
-                <div class="table-responsive overflow-auto" style="max-height: 500px;">
-                  <table class="table">
-                    <tbody>
-                      <tr>
-                        <td>
-                          <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="report1" onclick="toggleReport(this, 'Financial Ratios B1-B10')">
-                            <label class="form-check-label" for="report1">Financial Ratios B1-B10</label>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="report2" onclick="toggleReport(this, 'Balance Sheet Summary')">
-                            <label class="form-check-label" for="report2">Balance Sheet Summary</label>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="report3" onclick="toggleReport(this, 'Income Statement')">
-                            <label class="form-check-label" for="report3">Income Statement</label>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="report4" onclick="toggleReport(this, 'Cash Flow Report')">
-                            <label class="form-check-label" for="report4">Cash Flow Report</label>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="report5" onclick="toggleReport(this, 'Loan Ledger')">
-                            <label class="form-check-label" for="report5">Loan Ledger</label>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Middle & Right Columns Combined -->
-          <div class="col-8">
-            <!-- Parameters Section - Always Visible -->
-            <div class="mb-4" id="parametersSection">
-              <div class="row mb-3">
-                <div class="col">
-                  <h5>Financial Ratios B1-B10: Parameters</h5>
-                </div>
-              </div>
-              <div class="card mb-3">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <label class="form-label">Report Period</label>
-                      <div class="d-flex gap-2">
-                        <select class="form-select">
-                          <option>January</option><option>February</option><option>March</option><option>April</option>
-                          <option>May</option><option>June</option><option>July</option><option>August</option>
-                          <option>September</option><option>October</option><option>November</option><option>December</option>
-                        </select>
-                        <select class="form-select">
-                          <option>2025</option><option>2024</option><option>2023</option><option>2022</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label">Period Day</label>
-                      <input type="date" class="form-control">
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="text-muted small mb-3">Report doesn't require any parameters</div>
-            </div>
-
-            <!-- Companies Section -->
-            <div class="mb-3">
-              <div class="row align-items-center">
-                <div class="col-7">
-                  <h5>Financial Ratios B1-B10: Entities</h5>
-                </div>
-                <div class="col-3">
-                  <span id="selectedCount">0</span> Selected Entities
-                </div>
-                <div class="col-2 text-end" onclick="resetSelection()" style="cursor: pointer;">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
-                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
-                  </svg>
-                  Reset
-                </div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-body">
-                <div class="row mb-3">
-                  <div class="col d-flex gap-2">
-                    <button class="btn btn-outline-secondary" onclick="openFilterModal()">
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
-                      </svg>
-                    </button>
-                    <div class="input-group">
-                      <span class="input-group-text">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                        </svg>
-                      </span>
-                      <input type="text" class="form-control" placeholder="Search..." id="companySearch">
-                    </div>
-                  </div>
-                </div>
-                <div class="table-responsive overflow-auto" style="max-height: 400px;">
-                  <table class="table table-sm">
-                    <thead class="position-sticky top-0 bg-white">
-                      <tr>
-                        <th><input type="checkbox" id="selectAllCompanies" onclick="toggleSelectAll()"></th>
-                        <th>Type</th>
-                        <th>Report Name</th>
-                        <th>Ccode</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td><input type="checkbox" class="company-checkbox" data-name="ABC Corporation" onclick="updateSelectedList()"></td>
-                        <td>LLC</td><td>ABC Corporation</td><td>ABC001</td><td>John</td><td>Doe</td><td>Active</td>
-                      </tr>
-                      <tr>
-                        <td><input type="checkbox" class="company-checkbox" data-name="XYZ Enterprises" onclick="updateSelectedList()"></td>
-                        <td>Corp</td><td>XYZ Enterprises</td><td>XYZ002</td><td>Jane</td><td>Smith</td><td>Active</td>
-                      </tr>
-                      <tr>
-                        <td><input type="checkbox" class="company-checkbox" data-name="Smith Consulting" onclick="updateSelectedList()"></td>
-                        <td>Sole</td><td>Smith Consulting</td><td>SMC003</td><td>Bob</td><td>Johnson</td><td>Active</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="row mt-4">
-          <div class="col text-end">
-            <span class="text-muted me-3" id="runHint">Select at least one report to run</span>
-            <button class="btn btn-primary" id="runBtn" disabled onclick="runSelectedReports()">Run Reports</button>
-          </div>
+        <div class="runner-footer">
+          <span class="runner-hint" id="run-hint">Select at least one report to run</span>
+          <button class="run-btn" id="run-btn" disabled>Run Reports</button>
         </div>
       </div>
-    </div>
     </div>
 
   </div>
