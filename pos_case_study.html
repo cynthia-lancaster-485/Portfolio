@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>POS Redesign — Cynthia Lancaster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --lime: #C8F135; --lime-dark: #9DC418;
+      --ink: #1A1A18; --paper: #F5F2EB;
+      --muted: #7A7A72; --card-bg: #fff;
+      --border: rgba(26,26,24,0.12); --radius: 20px;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); line-height: 1.6; overflow-x: hidden; }
+
+    /* NAV */
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 3rem; border-bottom: 1px solid var(--border); background: var(--paper); position: sticky; top: 0; z-index: 200; }
+    .nav-logo { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; text-decoration: none; color: var(--ink); }
+    .nav-back { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--muted); font-size: 0.85rem; transition: color 0.2s; }
+    .nav-back:hover { color: var(--ink); }
+
+    /* HERO */
+    .case-hero { padding: 5rem 3rem 4rem; max-width: 1100px; margin: 0 auto; }
+    .case-eyebrow { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .case-eyebrow::before { content: ''; width: 32px; height: 2px; background: var(--lime-dark); display: inline-block; }
+    .case-title { font-family: 'Fraunces', serif; font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 1.5rem; }
+    .case-title em { font-style: italic; color: var(--lime-dark); }
+    .case-subtitle { font-size: 1.1rem; color: var(--muted); max-width: 600px; line-height: 1.7; margin-bottom: 3rem; }
+    .case-meta { display: flex; gap: 3rem; flex-wrap: wrap; }
+    .meta-item label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.25rem; }
+    .meta-item span { font-size: 0.95rem; font-weight: 500; }
+
+    /* HERO IMAGE STRIP */
+    .hero-image-strip {
+      background: var(--ink);
+      padding: 3rem;
+      overflow: hidden;
+      position: relative;
+    }
+    .hero-image-strip::before {
+      content: 'MockUps-POS Resize · 87 Screens · Adobe XD';
+      position: absolute;
+      top: 1rem; left: 50%; transform: translateX(-50%);
+      font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      white-space: nowrap;
+    }
+    .hero-embed-preview {
+      max-width: 1100px;
+      margin: 0 auto;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: #1e1e1c;
+      height: 520px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .embed-placeholder {
+      text-align: center;
+      color: rgba(255,255,255,0.5);
+    }
+    .embed-placeholder .big { font-size: 3rem; margin-bottom: 0.75rem; }
+    .embed-placeholder p { font-size: 0.9rem; margin-bottom: 1.25rem; }
+    .open-xd-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--lime); color: var(--ink);
+      padding: 0.7rem 1.5rem; border-radius: 100px;
+      text-decoration: none; font-weight: 600; font-size: 0.88rem;
+      transition: transform 0.2s;
+    }
+    .open-xd-btn:hover { transform: translateY(-2px); }
+
+    /* SECTIONS */
+    .case-section { padding: 5rem 3rem; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section-heading { font-family: 'Fraunces', serif; font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .prose { color: var(--muted); font-size: 1rem; line-height: 1.8; max-width: 680px; }
+    .prose + .prose { margin-top: 1rem; }
+    .full-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+    /* PROBLEM CARDS */
+    .problem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2.5rem; }
+    .problem-card { background: var(--ink); color: #fff; border-radius: var(--radius); padding: 1.75rem; }
+    .problem-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .problem-card h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .problem-card p { font-size: 0.85rem; opacity: 0.6; line-height: 1.6; }
+
+    /* PROCESS TIMELINE */
+    .process-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 2.5rem; position: relative; }
+    .process-steps::before {
+      content: '';
+      position: absolute;
+      top: 28px; left: 5%; right: 5%;
+      height: 2px;
+      background: var(--border);
+    }
+    .process-step { text-align: center; padding: 0 1rem; position: relative; }
+    .step-circle {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--lime);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 1.3rem;
+      position: relative; z-index: 1;
+      border: 4px solid var(--paper);
+    }
+    .step-num { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+    .step-title { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .step-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.55; }
+
+    /* DESIGN DECISIONS */
+    .decisions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 2.5rem; }
+    .decision-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; }
+    .decision-tag { display: inline-block; background: #E8F5C8; color: #4A6B10; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.2rem 0.65rem; border-radius: 100px; margin-bottom: 0.85rem; }
+    .decision-card h4 { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.6rem; }
+    .decision-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+
+    /* PROTOTYPE EMBED SECTION */
+    .prototype-section { background: var(--ink); padding: 5rem 3rem; }
+    .prototype-inner { max-width: 1100px; margin: 0 auto; }
+    .prototype-section .section-label { color: rgba(255,255,255,0.4); }
+    .prototype-section .section-label::after { background: rgba(255,255,255,0.1); }
+    .prototype-section .section-heading { color: #fff; }
+    .prototype-section .prose { color: rgba(255,255,255,0.5); max-width: 560px; margin-bottom: 2rem; }
+
+    .view-toggle { display: flex; gap: 4px; background: rgba(255,255,255,0.08); border-radius: 100px; padding: 4px; width: fit-content; margin-bottom: 2rem; }
+    .view-btn { padding: 0.4rem 1.1rem; border-radius: 100px; border: none; cursor: pointer; font-size: 0.78rem; font-weight: 500; font-family: 'DM Sans', sans-serif; transition: all 0.2s; background: transparent; color: rgba(255,255,255,0.45); }
+    .view-btn.active { background: var(--lime); color: var(--ink); }
+
+    .xd-frame-wrap {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: #111;
+      position: relative;
+    }
+    /* browser chrome for the embed */
+    .xd-chrome {
+      background: #2a2a28;
+      padding: 0.65rem 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .xd-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .xd-dot.r { background: #FF5F57; } .xd-dot.y { background: #FFBD2E; } .xd-dot.g { background: #28C840; }
+    .xd-url { background: rgba(255,255,255,0.07); border-radius: 6px; padding: 0.2rem 0.9rem; font-size: 0.72rem; color: rgba(255,255,255,0.3); margin-left: 0.5rem; font-family: monospace; flex: 1; }
+    .xd-open-link { display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; color: var(--lime); text-decoration: none; white-space: nowrap; }
+
+    .xd-embed { display: block; }
+    .xd-embed iframe { width: 100%; height: 620px; border: none; display: block; }
+
+    .xd-grid { display: none; }
+    .xd-grid iframe { width: 100%; height: 700px; border: none; display: block; }
+
+    /* fallback CTA inside embed area */
+    .xd-fallback {
+      display: none;
+      flex-direction: column; align-items: center; justify-content: center;
+      height: 300px; gap: 1rem;
+      color: rgba(255,255,255,0.45); font-size: 0.9rem;
+      text-align: center; padding: 2rem;
+    }
+
+    /* STATS */
+    .stats-strip { background: var(--lime); padding: 3rem; }
+    .stats-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+    .stat-box { text-align: center; }
+    .stat-big { font-family: 'Fraunces', serif; font-size: 3rem; font-weight: 700; color: var(--ink); line-height: 1; }
+    .stat-label { font-size: 0.8rem; font-weight: 500; color: rgba(26,26,24,0.6); margin-top: 0.35rem; }
+
+    /* TAKEAWAYS */
+    .takeaway-section { background: var(--ink); color: #fff; padding: 5rem 3rem; }
+    .takeaway-inner { max-width: 1100px; margin: 0 auto; }
+    .takeaway-section .section-label { color: rgba(255,255,255,0.4); }
+    .takeaway-section .section-label::after { background: rgba(255,255,255,0.1); }
+    .takeaway-section .section-heading { color: #fff; }
+    .takeaway-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2.5rem; }
+    .takeaway-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius); padding: 1.75rem; }
+    .takeaway-num { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 700; color: var(--lime); margin-bottom: 0.75rem; }
+    .takeaway-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: #fff; }
+    .takeaway-card p { font-size: 0.83rem; color: rgba(255,255,255,0.5); line-height: 1.65; }
+
+    .back-section { padding: 3rem; text-align: center; }
+    .back-link { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--muted); font-size: 0.9rem; transition: color 0.2s; }
+    .back-link:hover { color: var(--ink); }
+
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .case-hero, .case-section { padding: 3rem 1.5rem; }
+      .hero-image-strip { padding: 1.5rem; }
+      .hero-embed-preview { height: 280px; }
+      .problem-grid { grid-template-columns: 1fr; }
+      .process-steps { grid-template-columns: 1fr 1fr; }
+      .process-steps::before { display: none; }
+      .decisions-grid { grid-template-columns: 1fr; }
+      .prototype-section { padding: 3rem 1.5rem; }
+      .stats-inner { grid-template-columns: 1fr 1fr; }
+      .takeaway-grid { grid-template-columns: 1fr; }
+      .takeaway-section { padding: 3rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Cynthia Lancaster.</a>
+  <a href="index.html#work" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+    Back to portfolio
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="case-hero">
+  <p class="case-eyebrow">Case Study · POS System Redesign</p>
+  <h1 class="case-title">A POS staff could finally<br><em>trust.</em></h1>
+  <p class="case-subtitle">
+    The existing point-of-sale system looked like it was built in another era. Staff hesitated before every transaction,
+    second-guessing whether they'd tapped the right thing. I redesigned it from the ground up — 87 screens,
+    built and shipped by a real development team.
+  </p>
+  <div class="case-meta">
+    <div class="meta-item"><label>Role</label><span>UX/UI Designer</span></div>
+    <div class="meta-item"><label>Tools</label><span>Adobe XD</span></div>
+    <div class="meta-item"><label>Industry</label><span>Retail</span></div>
+    <div class="meta-item"><label>Screens</label><span>87</span></div>
+    <div class="meta-item"><label>Status</label><span>Built & shipped ✓</span></div>
+  </div>
+</div>
+
+<!-- HERO VISUAL STRIP -->
+<div class="hero-image-strip">
+  <div class="hero-embed-preview">
+    <div class="embed-placeholder">
+      <div class="big">🖥️</div>
+      <p>87-screen hi-fi prototype · Adobe XD</p>
+      <a class="open-xd-btn" href="https://xd.adobe.com/view/bc5adf3d-1849-4382-bb8e-34b364d54c9f-e909/grid" target="_blank">
+        Open full prototype ↗
+      </a>
+    </div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- PROBLEM -->
+<div class="case-section">
+  <p class="section-label">The problem</p>
+  <h2 class="section-heading">When staff don't trust their tools, the whole business slows down.</h2>
+  <p class="prose">
+    The existing POS had been in use for years, but the interface hadn't kept up. It looked dated, the visual hierarchy was
+    unclear, and nothing felt reliable. Staff were hesitant — always second-guessing whether they'd pressed the right button,
+    whether a transaction had gone through, whether the screen was frozen or just slow.
+  </p>
+  <p class="prose">
+    That hesitation has a real cost: slower checkouts, more errors, more stress on staff, and frustrated customers.
+    The fix wasn't just cosmetic — it was about rebuilding confidence in the tool itself.
+  </p>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="problem-icon">😬</div>
+      <h4>Staff hesitation at every step</h4>
+      <p>The unclear visual design made staff pause and second-guess before every action — especially under pressure with customers waiting.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">🕰️</div>
+      <h4>Outdated visual language</h4>
+      <p>The interface looked like legacy software. Staff didn't feel like they were using a professional, reliable tool — and that perception matters.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">❓</div>
+      <h4>No clear feedback or hierarchy</h4>
+      <p>Actions didn't confirm they'd worked. Important controls weren't visually distinct from secondary ones. Everything felt equally weighted.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- PROCESS -->
+<div class="case-section">
+  <p class="section-label">The process</p>
+  <h2 class="section-heading">From observations to a 87-screen deliverable.</h2>
+  <p class="prose">Without a formal UX team, I drove the process myself — from understanding the problem to handing off a complete hi-fi prototype that developers could build directly from.</p>
+  <div class="process-steps">
+    <div class="process-step">
+      <div class="step-circle">👁️</div>
+      <div class="step-num">Step 01</div>
+      <div class="step-title">Observe & Listen</div>
+      <p class="step-desc">Watched staff use the existing system in real transactions. Noted where they hesitated, what they clicked twice, and what made them sigh.</p>
+    </div>
+    <div class="process-step">
+      <div class="step-circle">📝</div>
+      <div class="step-num">Step 02</div>
+      <div class="step-title">Define the gaps</div>
+      <p class="step-desc">Mapped the full transaction flow and identified every point where the design was working against the user instead of with them.</p>
+    </div>
+    <div class="process-step">
+      <div class="step-circle">✏️</div>
+      <div class="step-num">Step 03</div>
+      <div class="step-title">Lo-fi → Hi-fi</div>
+      <p class="step-desc">Started with wireframe sketches to nail the layout and flow before investing in visual design. Iterated in Adobe XD through to a polished 87-screen hi-fi.</p>
+    </div>
+    <div class="process-step">
+      <div class="step-circle">🚀</div>
+      <div class="step-num">Step 04</div>
+      <div class="step-title">Handoff & build</div>
+      <p class="step-desc">Delivered the complete prototype to the development team. The designs were built into a working POS system used by real staff every day.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- DESIGN DECISIONS -->
+<div class="case-section">
+  <p class="section-label">Design decisions</p>
+  <h2 class="section-heading">What I changed and why.</h2>
+  <div class="decisions-grid">
+    <div class="decision-card">
+      <span class="decision-tag">Visual trust</span>
+      <h4>Clean, modern visual language</h4>
+      <p>Replaced the legacy aesthetic with a clean, high-contrast design system. Clear typography, consistent spacing, and a reliable color language so staff always know what's interactive and what's informational.</p>
+    </div>
+    <div class="decision-card">
+      <span class="decision-tag">Feedback</span>
+      <h4>Every action confirms itself</h4>
+      <p>Added clear confirmation states for every significant action — button presses, completed transactions, applied discounts. Staff never have to wonder "did that work?" again.</p>
+    </div>
+    <div class="decision-card">
+      <span class="decision-tag">Hierarchy</span>
+      <h4>Primary actions are unmissable</h4>
+      <p>Redesigned the visual weight of every screen so the most important action — charge, confirm, next — is always the most visually prominent element. Secondary actions step back.</p>
+    </div>
+    <div class="decision-card">
+      <span class="decision-tag">Speed</span>
+      <h4>Fewer taps for common tasks</h4>
+      <p>Analyzed which workflows were most frequent and streamlined them. The most common transaction paths were reduced to the minimum number of steps without sacrificing accuracy.</p>
+    </div>
+    <div class="decision-card">
+      <span class="decision-tag">Error prevention</span>
+      <h4>Hard to make mistakes</h4>
+      <p>Destructive or irreversible actions (voids, refunds, discounts) are visually distinct and require confirmation. The design makes the right thing easy and the wrong thing harder.</p>
+    </div>
+    <div class="decision-card">
+      <span class="decision-tag">Scale</span>
+      <h4>87 screens, fully consistent</h4>
+      <p>Built a complete design system for the prototype — reusable components, consistent patterns, and a logic that scales across every flow, from checkout to inventory to end-of-day reporting.</p>
+    </div>
+  </div>
+</div>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stats-inner">
+    <div class="stat-box">
+      <div class="stat-big">87</div>
+      <div class="stat-label">Screens designed</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-big">1</div>
+      <div class="stat-label">Designer (me)</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-big">✓</div>
+      <div class="stat-label">Built by devs &amp; shipped</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-big">0</div>
+      <div class="stat-label">Guesswork in the UI</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROTOTYPE EMBED -->
+<div class="prototype-section">
+  <div class="prototype-inner">
+    <p class="section-label">The prototype</p>
+    <h2 class="section-heading">All 87 screens, right here.</h2>
+    <p class="prose">Browse the complete hi-fi prototype below. Switch between the interactive prototype view (click through the flows) and the grid view (see all screens at once).</p>
+
+    <div class="view-toggle">
+      <button class="view-btn active" onclick="showView('prototype')">▶ Prototype</button>
+      <button class="view-btn" onclick="showView('grid')">⊞ Grid view</button>
+    </div>
+
+    <div class="xd-frame-wrap">
+      <div class="xd-chrome">
+        <div class="xd-dot r"></div>
+        <div class="xd-dot y"></div>
+        <div class="xd-dot g"></div>
+        <div class="xd-url">xd.adobe.com · MockUps-POS Resize</div>
+        <a class="xd-open-link" href="https://xd.adobe.com/view/bc5adf3d-1849-4382-bb8e-34b364d54c9f-e909/" target="_blank">
+          Open in XD ↗
+        </a>
+      </div>
+
+      <!-- Prototype view -->
+      <div class="xd-embed" id="view-prototype">
+        <iframe
+          src="https://xd.adobe.com/embed/bc5adf3d-1849-4382-bb8e-34b364d54c9f-e909"
+          allowfullscreen
+          loading="lazy"
+          title="POS Redesign Prototype">
+        </iframe>
+      </div>
+
+      <!-- Grid view -->
+      <div class="xd-grid" id="view-grid">
+        <iframe
+          src="https://xd.adobe.com/view/bc5adf3d-1849-4382-bb8e-34b364d54c9f-e909/grid"
+          allowfullscreen
+          loading="lazy"
+          title="POS Redesign Grid">
+        </iframe>
+      </div>
+    </div>
+
+    <p style="font-size:0.78rem; color:rgba(255,255,255,0.3); margin-top:1rem; text-align:center;">
+      If the embed doesn't load, <a href="https://xd.adobe.com/view/bc5adf3d-1849-4382-bb8e-34b364d54c9f-e909/" target="_blank" style="color:var(--lime);">open the prototype directly in Adobe XD ↗</a>
+    </p>
+  </div>
+</div>
+
+<!-- TAKEAWAYS -->
+<div class="takeaway-section">
+  <div class="takeaway-inner">
+    <p class="section-label">What I learned</p>
+    <h2 class="section-heading">Three things this project taught me.</h2>
+    <div class="takeaway-grid">
+      <div class="takeaway-card">
+        <div class="takeaway-num">01</div>
+        <h4>Trust is a design outcome</h4>
+        <p>Users don't articulate "I don't trust this interface" — they just hesitate. Watching where staff paused taught me that confidence in a tool is something you design for explicitly, not accidentally.</p>
+      </div>
+      <div class="takeaway-card">
+        <div class="takeaway-num">02</div>
+        <h4>Handoff is part of the design</h4>
+        <p>Working directly with developers taught me that a great prototype is only half the job. Clear naming, component consistency, and annotated logic made the build go smoothly and stay true to the design.</p>
+      </div>
+      <div class="takeaway-card">
+        <div class="takeaway-num">03</div>
+        <h4>Scale forces discipline</h4>
+        <p>87 screens will expose every inconsistency in your design system immediately. Building with reusable components from the start wasn't optional — it was the only way to keep 87 screens coherent.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="back-section">
+  <a href="index.html#work" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+    Back to all projects
+  </a>
+</div>
+
+<script>
+  function showView(view) {
+    document.getElementById('view-prototype').style.display = view === 'prototype' ? 'block' : 'none';
+    document.getElementById('view-grid').style.display = view === 'grid' ? 'block' : 'none';
+    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
