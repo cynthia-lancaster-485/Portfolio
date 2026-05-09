@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report System Redesign — Cynthia Lancaster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --lime: #C8F135; --lime-dark: #9DC418;
+      --ink: #1A1A18; --paper: #F5F2EB;
+      --muted: #7A7A72; --card-bg: #fff;
+      --border: rgba(26,26,24,0.12); --radius: 20px;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); line-height: 1.6; overflow-x: hidden; }
+
+    /* NAV */
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 3rem; border-bottom: 1px solid var(--border); background: var(--paper); position: sticky; top: 0; z-index: 200; }
+    .nav-logo { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; text-decoration: none; color: var(--ink); }
+    .nav-back { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--muted); font-size: 0.85rem; transition: color 0.2s; }
+    .nav-back:hover { color: var(--ink); }
+
+    /* HERO */
+    .case-hero { padding: 5rem 3rem 4rem; max-width: 1100px; margin: 0 auto; }
+    .case-eyebrow { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .case-eyebrow::before { content: ''; width: 32px; height: 2px; background: var(--lime-dark); display: inline-block; }
+    .case-title { font-family: 'Fraunces', serif; font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 1.5rem; }
+    .case-title em { font-style: italic; color: var(--lime-dark); }
+    .case-subtitle { font-size: 1.1rem; color: var(--muted); max-width: 600px; line-height: 1.7; margin-bottom: 3rem; }
+    .case-meta { display: flex; gap: 3rem; }
+    .meta-item label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.25rem; }
+    .meta-item span { font-size: 0.95rem; font-weight: 500; }
+
+    /* SECTION STYLES */
+    .case-section { padding: 5rem 3rem; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section-heading { font-family: 'Fraunces', serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
+    .prose { color: var(--muted); font-size: 1rem; line-height: 1.8; max-width: 680px; }
+    .prose + .prose { margin-top: 1rem; }
+
+    /* PROBLEM CARDS */
+    .problem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2.5rem; }
+    .problem-card { background: var(--ink); color: #fff; border-radius: var(--radius); padding: 1.75rem; }
+    .problem-num { font-family: 'Fraunces', serif; font-size: 2.5rem; font-weight: 700; color: var(--lime); line-height: 1; margin-bottom: 0.75rem; }
+    .problem-card h4 { font-size: 1rem; font-weight: 500; margin-bottom: 0.5rem; }
+    .problem-card p { font-size: 0.85rem; opacity: 0.6; line-height: 1.6; }
+
+    /* BEFORE/AFTER TOGGLE */
+    .demo-wrapper { background: var(--ink); border-radius: var(--radius); overflow: hidden; margin: 3rem 0; }
+    .demo-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .demo-title { font-family: 'Fraunces', serif; font-size: 1.1rem; color: #fff; font-weight: 500; }
+    .toggle-group { display: flex; background: rgba(255,255,255,0.08); border-radius: 100px; padding: 4px; gap: 4px; }
+    .toggle-btn { padding: 0.4rem 1.25rem; border-radius: 100px; border: none; cursor: pointer; font-size: 0.82rem; font-weight: 500; font-family: 'DM Sans', sans-serif; transition: all 0.2s; background: transparent; color: rgba(255,255,255,0.5); }
+    .toggle-btn.active { background: var(--lime); color: var(--ink); }
+
+    /* BROWSER CHROME */
+    .browser-chrome { background: #2a2a28; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .browser-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red { background: #FF5F57; } .dot-yellow { background: #FFBD2E; } .dot-green { background: #28C840; }
+    .browser-url { background: rgba(255,255,255,0.07); border-radius: 6px; padding: 0.25rem 1rem; font-size: 0.75rem; color: rgba(255,255,255,0.35); margin-left: 0.75rem; font-family: monospace; }
+
+    .demo-panel { display: none; }
+    .demo-panel.active { display: block; }
+
+    /* ===== BEFORE UI (Bootstrap-style dense table) ===== */
+    .before-ui { background: #f8f9fa; padding: 1rem; font-size: 13px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; min-height: 520px; }
+    .before-ui .b-container { max-width: 100%; }
+    .before-ui .b-header { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: flex-end; padding: 0.5rem 0 1rem; border-bottom: 1px solid #dee2e6; margin-bottom: 0.75rem; }
+    .before-ui h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: #212529; }
+    .before-ui .b-card { background: #fff; border: 1px solid #dee2e6; border-radius: 4px; padding: 0.5rem; }
+    .before-ui select, .before-ui input[type=text] { font-size: 12px; padding: 3px 6px; border: 1px solid #ced4da; border-radius: 3px; background: #fff; }
+    .before-ui .btn-info-sm { background: #0dcaf0; border: none; color: #000; font-size: 11px; padding: 3px 8px; border-radius: 3px; cursor: pointer; }
+    .before-ui .btn-plus { background: #0dcaf0; border: none; width: 22px; height: 22px; border-radius: 3px; cursor: pointer; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; }
+    .before-ui .b-row { display: flex; gap: 0.5rem; align-items: flex-start; }
+    .before-ui .b-col-3 { flex: 0 0 22%; }
+    .before-ui .b-col-5 { flex: 0 0 42%; }
+    .before-ui .b-col-4 { flex: 0 0 30%; }
+    .before-ui table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .before-ui thead th { background: #e9ecef; padding: 3px 5px; border: 1px solid #dee2e6; font-weight: 600; white-space: nowrap; font-size: 10px; }
+    .before-ui tbody td { padding: 2px 5px; border: 1px solid #dee2e6; white-space: nowrap; color: #495057; }
+    .before-ui tbody tr:nth-child(even) { background: #f2f2f2; }
+    .before-ui .table-holder { max-height: 200px; overflow-y: auto; overflow-x: auto; }
+    .before-ui .label-sm { font-size: 11px; color: #6c757d; }
+    .before-ui h5 { font-size: 0.85rem; font-weight: 600; margin: 4px 0; }
+
+    /* ===== AFTER UI — Page 1: Report Groups ===== */
+    .after-ui { background: #ffffff; min-height: 520px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 14px; }
+    .after-topbar { background: #fff; padding: 0.6rem 1.5rem; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; }
+    .after-back { display: flex; align-items: center; gap: 0.4rem; color: #9ca3af; font-size: 12px; cursor: pointer; }
+    .after-back svg { width: 14px; height: 14px; }
+    .after-content { padding: 2rem 1.5rem; }
+    .after-page-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; color: #111827; }
+    .after-search { display: flex; align-items: center; gap: 0.5rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.5rem 1rem; margin-bottom: 1.5rem; }
+    .after-search svg { color: #9ca3af; width: 15px; flex-shrink: 0; }
+    .after-search input { border: none; background: transparent; outline: none; font-size: 13px; width: 100%; color: #374151; }
+    .report-card-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .report-card-item { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+    .report-card-item:hover { border-color: #6366f1; box-shadow: 0 2px 12px rgba(99,102,241,0.08); }
+    .rci-left h4 { font-size: 0.9rem; font-weight: 600; color: #111827; margin-bottom: 0.15rem; }
+    .rci-left p { font-size: 0.75rem; color: #9ca3af; }
+    .rci-right { display: flex; align-items: center; gap: 0.5rem; }
+    .rci-param { font-size: 0.72rem; background: #f3f4f6; color: #6b7280; padding: 0.15rem 0.6rem; border-radius: 100px; }
+    .rci-actions { display: flex; gap: 0.25rem; }
+    .rci-btn { border: none; background: transparent; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem; color: #6b7280; transition: background 0.15s; }
+    .rci-btn:hover { background: #f3f4f6; }
+    .rci-btn.pdf { color: #3b82f6; }
+    .rci-btn.excel { color: #16a34a; }
+    .rci-btn.danger { color: #ef4444; }
+    .after-new-btn { display: flex; align-items: center; gap: 0.4rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.82rem; font-weight: 500; cursor: pointer; color: #374151; transition: background 0.15s; }
+    .after-new-btn:hover { background: #f3f4f6; }
+    .after-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+
+    /* ===== AFTER UI — Page 2: Report Runner ===== */
+    .runner-ui { background: #fff; min-height: 520px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 14px; }
+    .runner-header { padding: 1.25rem 1.5rem 0; }
+    .runner-period-bar { display: flex; align-items: center; gap: 1rem; padding: 0.85rem 1.5rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+    .period-label { font-size: 0.75rem; font-weight: 500; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; }
+    .period-selects { display: flex; gap: 0.5rem; }
+    .period-selects select { border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.3rem 0.75rem; font-size: 0.82rem; background: #fff; color: #374151; }
+    .runner-body { display: grid; grid-template-columns: 1fr 1.6fr 0.9fr; gap: 0; border-top: 1px solid #e5e7eb; }
+    .runner-col { border-right: 1px solid #e5e7eb; }
+    .runner-col:last-child { border-right: none; }
+    .runner-col-header { padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; }
+    .runner-col-header h5 { font-size: 0.82rem; font-weight: 600; color: #374151; }
+    .runner-col-header input { border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.75rem; width: 120px; }
+    .runner-list { max-height: 300px; overflow-y: auto; }
+    .runner-report-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 1rem; border-bottom: 1px solid #f3f4f6; }
+    .runner-report-row:hover { background: #f9fafb; }
+    .runner-report-row span { font-size: 0.82rem; color: #374151; }
+    .runner-add-btn { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #e5e7eb; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #9ca3af; transition: all 0.15s; flex-shrink: 0; }
+    .runner-add-btn.added { border-color: #16a34a; background: #dcfce7; color: #16a34a; }
+    .runner-add-btn:hover { border-color: #6366f1; color: #6366f1; }
+    .company-search-bar { padding: 0.6rem 1rem; border-bottom: 1px solid #e5e7eb; display: flex; gap: 0.5rem; align-items: center; }
+    .company-search-bar select { border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.75rem; }
+    .company-search-bar input { border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.25rem 0.6rem; font-size: 0.75rem; flex: 1; }
+    .company-mini-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .company-mini-table th { background: #f9fafb; padding: 5px 8px; border-bottom: 1px solid #e5e7eb; font-weight: 500; color: #6b7280; text-align: left; font-size: 10px; }
+    .company-mini-table td { padding: 5px 8px; border-bottom: 1px solid #f3f4f6; color: #374151; }
+    .selected-chip { display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0.75rem; margin: 0.35rem 0.75rem; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; }
+    .selected-chip span { font-size: 0.78rem; color: #0369a1; font-weight: 500; }
+    .selected-chip button { border: none; background: transparent; color: #94a3b8; cursor: pointer; font-size: 14px; line-height: 1; }
+    .runner-footer { padding: 0.75rem 1rem; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+    .run-btn { background: #6366f1; color: #fff; border: none; border-radius: 8px; padding: 0.5rem 1.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .run-btn:hover { background: #4f46e5; }
+    .run-btn:disabled { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
+    .runner-hint { font-size: 0.75rem; color: #9ca3af; }
+
+    /* DEMO NAV (page switcher inside after demo) */
+    .demo-page-nav { display: flex; gap: 0; background: rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .demo-page-tab { padding: 0.6rem 1.25rem; font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.4); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; background: transparent; border-top: none; border-left: none; border-right: none; font-family: 'DM Sans', sans-serif; }
+    .demo-page-tab.active { color: var(--lime); border-bottom-color: var(--lime); }
+
+    /* INSIGHTS */
+    .insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+    .insight-card { border-radius: var(--radius); padding: 2rem; border: 1px solid var(--border); }
+    .insight-card.before-card { background: #fff8f6; border-color: #fcd9cc; }
+    .insight-card.after-card { background: #f6fbee; border-color: #d4edab; }
+    .insight-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .insight-label.before { color: #c0392b; }
+    .insight-label.after { color: #27ae60; }
+    .insight-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .insight-dot.before { background: #e74c3c; }
+    .insight-dot.after { background: #2ecc71; }
+    .insight-list { list-style: none; }
+    .insight-list li { font-size: 0.88rem; line-height: 1.6; color: var(--muted); padding: 0.4rem 0; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; gap: 0.5rem; }
+    .insight-list li:last-child { border: none; }
+    .insight-list li::before { content: '→'; font-weight: 600; flex-shrink: 0; }
+    .insight-list.before li::before { color: #e74c3c; }
+    .insight-list.after li::before { color: #2ecc71; }
+
+    /* TAKEAWAYS */
+    .takeaway-section { background: var(--ink); color: #fff; padding: 5rem 3rem; }
+    .takeaway-inner { max-width: 1100px; margin: 0 auto; }
+    .takeaway-section .section-label { color: rgba(255,255,255,0.4); }
+    .takeaway-section .section-label::after { background: rgba(255,255,255,0.1); }
+    .takeaway-section .section-heading { color: #fff; }
+    .takeaway-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2.5rem; }
+    .takeaway-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius); padding: 1.75rem; }
+    .takeaway-num { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 700; color: var(--lime); margin-bottom: 0.75rem; }
+    .takeaway-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: #fff; }
+    .takeaway-card p { font-size: 0.83rem; color: rgba(255,255,255,0.5); line-height: 1.65; }
+
+    /* BACK TO PORTFOLIO */
+    .back-section { padding: 3rem; text-align: center; }
+    .back-link { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--muted); font-size: 0.9rem; transition: color 0.2s; }
+    .back-link:hover { color: var(--ink); }
+
+    /* DIVIDER */
+    .full-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .case-hero, .case-section { padding: 3rem 1.5rem; }
+      .problem-grid, .takeaway-grid { grid-template-columns: 1fr; }
+      .insight-grid { grid-template-columns: 1fr; }
+      .runner-body { grid-template-columns: 1fr; }
+      .runner-col { border-right: none; border-bottom: 1px solid #e5e7eb; }
+      .case-meta { flex-wrap: wrap; gap: 1.5rem; }
+      .takeaway-section { padding: 3rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Cynthia Lancaster.</a>
+  <a href="index.html#work" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+    Back to portfolio
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="case-hero">
+  <p class="case-eyebrow">Case Study · Report System Redesign</p>
+  <h1 class="case-title">Turning a tangled<br>report runner into<br>something <em>seamless.</em></h1>
+  <p class="case-subtitle">A real workplace project: I inherited a dense, hard-to-use report management system and redesigned it from the ground up — simplifying the mental model, reducing visual noise, and making the most common tasks actually enjoyable.</p>
+  <div class="case-meta">
+    <div class="meta-item"><label>Role</label><span>UX/UI Designer + Developer</span></div>
+    <div class="meta-item"><label>Tools</label><span>Figma, Angular, TypeScript</span></div>
+    <div class="meta-item"><label>Type</label><span>Workplace project</span></div>
+    <div class="meta-item"><label>Status</label><span>Shipped ✓</span></div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- PROBLEM -->
+<div class="case-section">
+  <p class="section-label">The problem</p>
+  <h2 class="section-heading">The original system made a simple task feel exhausting.</h2>
+  <p class="prose">Users needed to select reports and companies, set a period, and run them — a straightforward workflow buried under an overwhelming wall of controls and data. The interface prioritized showing everything at once over helping users accomplish anything quickly.</p>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="problem-num">20+</div>
+      <h4>Columns in the company table</h4>
+      <p>The main selection table showed every data field at once, forcing users to scroll horizontally to find what they needed.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-num">0</div>
+      <h4>Saved report configurations</h4>
+      <p>Every session started from scratch. Users had to re-select the same reports and companies over and over, every single time.</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-num">∞</div>
+      <h4>Context switching required</h4>
+      <p>Controls for period, search filters, company list type, and run action were all scattered, with no clear visual hierarchy.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- INTERACTIVE DEMO -->
+<div class="case-section" style="padding-bottom: 2rem;">
+  <p class="section-label">Interactive comparison</p>
+  <h2 class="section-heading">See the difference for yourself.</h2>
+  <p class="prose">Toggle between the original interface and the redesign below. Both are fully interactive simulations built from the real code.</p>
+</div>
+
+<div style="padding: 0 3rem 5rem; max-width: 1100px; margin: 0 auto;">
+  <div class="demo-wrapper">
+    <div class="demo-header">
+      <span class="demo-title">Report System — Live Demo</span>
+      <div class="toggle-group">
+        <button class="toggle-btn active" onclick="switchDemo('before')">Before</button>
+        <button class="toggle-btn" onclick="switchDemo('after')">After</button>
+      </div>
+    </div>
+
+    <!-- BEFORE PANEL -->
+    <div class="demo-panel active" id="panel-before">
+      <div class="browser-chrome">
+        <div class="browser-dot dot-red"></div>
+        <div class="browser-dot dot-yellow"></div>
+        <div class="browser-dot dot-green"></div>
+        <div class="browser-url">localhost:4200/report-runner/company-specific</div>
+      </div>
+      <div class="before-ui">
+        <div class="b-container">
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px; color:#6c757d; font-size:12px; cursor:pointer;">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+            Dashboard
+          </div>
+          <h4>Company Specific Report Runner</h4>
+          <hr style="margin:6px 0 8px;">
+          <div class="b-header">
+            <div class="b-card b-col-3">
+              <h5>Choose Report Period</h5>
+              <div style="display:flex; gap:4px;">
+                <select><option>May</option><option>April</option><option>March</option></select>
+                <select><option>2025</option><option>2024</option><option>2023</option></select>
+              </div>
+            </div>
+            <div style="flex:1; display:flex; gap:6px; align-items:flex-end; flex-wrap:wrap;">
+              <div>
+                <span class="label-sm">Search by </span>
+                <select><option>Report Name</option><option>Company Type</option><option>Last Name</option><option>Ccode</option><option>Bundle Group</option></select>
+              </div>
+              <div>
+                <select><option>Active Companies</option><option>Active Inventory Companies</option></select>
+              </div>
+            </div>
+            <div>
+              <button class="btn-info-sm" style="padding:5px 12px; font-size:12px;">Run Reports (0)</button>
+            </div>
+          </div>
+          <div class="b-row" style="margin-top:6px; gap:6px;">
+            <div class="b-card b-col-3">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <h5>Report List</h5>
+                <input type="text" placeholder="Search" style="width:100px; font-size:11px; padding:2px 4px;">
+              </div>
+              <div class="table-holder">
+                <table>
+                  <thead><tr><th>Title</th><th>Add</th></tr></thead>
+                  <tbody>
+                    <tr><td>Financial Ratios B1-B10</td><td><button class="btn-plus">+</button></td></tr>
+                    <tr><td>Balance Sheet Summary</td><td><button class="btn-plus">+</button></td></tr>
+                    <tr><td>Income Statement</td><td><button class="btn-plus">+</button></td></tr>
+                    <tr><td>Cash Flow Report</td><td><button class="btn-plus">+</button></td></tr>
+                    <tr><td>Loan Ledger</td><td><button class="btn-plus">+</button></td></tr>
+                    <tr><td>Tax Summary</td><td><button class="btn-plus">+</button></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="b-card b-col-5">
+              <div style="display:flex; gap:6px; margin-bottom:6px; align-items:center;">
+                <input type="text" placeholder="Search By Report Name" style="width:140px;">
+                <button class="btn-info-sm" style="font-size:10px; white-space:nowrap;">Select Entities</button>
+              </div>
+              <div class="table-holder">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Add</th><th>Type</th><th>Report Name</th><th>Ccode</th>
+                      <th>First Name</th><th>Last Name</th><th>Middle</th><th>CC Master</th>
+                      <th>Bundle Grp</th><th>Status</th><th>CS Grp</th><th>Card Type</th>
+                      <th>Tax Co</th><th>Tax Grp</th><th>CC Grp 1</th><th>CC Grp 2</th>
+                      <th>CC Grp 3</th><th>CC Grp 4</th><th>Birthdate</th><th>Entity ID</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><button class="btn-plus">+</button></td><td>LLC</td><td>ABC Corporation</td><td>ABC001</td><td>John</td><td>Smith</td><td>A</td><td>M001</td><td>Group A</td><td>Active</td><td>CS1</td><td>Visa</td><td>TaxCo1</td><td>CS1</td><td>CG1</td><td>CG2</td><td>CG3</td><td>CG4</td><td>Jan 15, 1980</td><td>1</td></tr>
+                    <tr><td><button class="btn-plus">+</button></td><td>Corp</td><td>XYZ Enterprises</td><td>XYZ002</td><td>Jane</td><td>Doe</td><td>B</td><td>M002</td><td>Group B</td><td>Active</td><td>CS2</td><td>MC</td><td>TaxCo2</td><td>CS2</td><td>CG1</td><td>CG2</td><td>CG3</td><td>CG4</td><td>May 20, 1975</td><td>2</td></tr>
+                    <tr><td><button class="btn-plus">+</button></td><td>Sole</td><td>Smith Consulting</td><td>SMC003</td><td>Robert</td><td>Johnson</td><td>C</td><td>M003</td><td>Group A</td><td>Active</td><td>CS1</td><td>Amex</td><td>TaxCo1</td><td>CS1</td><td>CG1</td><td>CG2</td><td>CG3</td><td>CG4</td><td>Aug 10, 1985</td><td>3</td></tr>
+                    <tr><td><button class="btn-plus">+</button></td><td>Part</td><td>Johnson &amp; Sons</td><td>JNS004</td><td>Michael</td><td>Williams</td><td>D</td><td>M004</td><td>Group C</td><td>Active</td><td>CS3</td><td>Disc</td><td>TaxCo3</td><td>CS3</td><td>CG1</td><td>CG2</td><td>CG3</td><td>CG4</td><td>Mar 25, 1990</td><td>4</td></tr>
+                    <tr><td><button class="btn-plus">+</button></td><td>LLC</td><td>Williams Group</td><td>WLG005</td><td>Sarah</td><td>Brown</td><td>E</td><td>M005</td><td>Group B</td><td>Active</td><td>CS2</td><td>Visa</td><td>TaxCo2</td><td>CS2</td><td>CG1</td><td>CG2</td><td>CG3</td><td>CG4</td><td>Nov 30, 1988</td><td>5</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="b-col-4">
+              <div class="b-card">
+                <h5>Selected Entities (0)</h5>
+                <div class="table-holder" style="height:150px;">
+                  <table><thead><tr><th>Name</th><th>Remove</th></tr></thead><tbody><tr><td colspan="2" style="text-align:center; color:#adb5bd; padding:1rem; font-size:11px;">No entities selected</td></tr></tbody></table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AFTER PANEL -->
+    <div class="demo-panel" id="panel-after">
+      <div class="demo-page-nav">
+        <button class="demo-page-tab active" onclick="switchAfterPage('groups')">① My Reports</button>
+        <button class="demo-page-tab" onclick="switchAfterPage('runner')">② Run a Report</button>
+      </div>
+      <div class="browser-chrome">
+        <div class="browser-dot dot-red"></div>
+        <div class="browser-dot dot-yellow"></div>
+        <div class="browser-dot dot-green"></div>
+        <div class="browser-url" id="after-url">localhost:4200/report-groups</div>
+      </div>
+
+      <!-- After Page 1: Groups -->
+      <div id="after-groups" class="after-ui">
+        <div class="after-topbar">
+          <div class="after-back" onclick="switchAfterPage('groups')">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+            Dashboard
+          </div>
+        </div>
+        <div class="after-content">
+          <div class="after-top-row">
+            <h1 class="after-page-title">My Reports</h1>
+            <button class="after-new-btn" onclick="switchAfterPage('runner')">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+              New Report
+            </button>
+          </div>
+          <div class="after-search">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg>
+            <input type="text" placeholder="Search saved reports...">
+          </div>
+          <div class="report-card-list">
+            <div class="report-card-item">
+              <div class="rci-left">
+                <h4>Q1 Balance Sheet</h4>
+                <p>Period: January 2024</p>
+              </div>
+              <div class="rci-right">
+                <span class="rci-param">1 parameter</span>
+                <div class="rci-actions">
+                  <button class="rci-btn pdf">📄 PDF</button>
+                  <button class="rci-btn excel">📊 Excel</button>
+                  <button class="rci-btn">✏️ Edit</button>
+                  <button class="rci-btn danger">🗑</button>
+                </div>
+              </div>
+            </div>
+            <div class="report-card-item">
+              <div class="rci-left">
+                <h4>Annual Income Statement</h4>
+                <p>Period: March 2024 · 2 entities</p>
+              </div>
+              <div class="rci-right">
+                <span class="rci-param">2 parameters</span>
+                <div class="rci-actions">
+                  <button class="rci-btn pdf">📄 PDF</button>
+                  <button class="rci-btn excel">📊 Excel</button>
+                  <button class="rci-btn">✏️ Edit</button>
+                  <button class="rci-btn danger">🗑</button>
+                </div>
+              </div>
+            </div>
+            <div class="report-card-item">
+              <div class="rci-left">
+                <h4>Loan Summary Report</h4>
+                <p>Ledger item: 2001</p>
+              </div>
+              <div class="rci-right">
+                <span class="rci-param">1 parameter</span>
+                <div class="rci-actions">
+                  <button class="rci-btn pdf">📄 PDF</button>
+                  <button class="rci-btn excel">📊 Excel</button>
+                  <button class="rci-btn">✏️ Edit</button>
+                  <button class="rci-btn danger">🗑</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- After Page 2: Runner -->
+      <div id="after-runner" class="runner-ui" style="display:none;">
+        <div class="runner-header">
+          <div style="display:flex; align-items:center; gap:6px; color:#9ca3af; font-size:12px; margin-bottom:0.75rem; cursor:pointer;" onclick="switchAfterPage('groups')">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+            My Reports
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:0.75rem;">
+            <h2 style="font-size:1.1rem; font-weight:700; color:#111827;">New Report Configuration</h2>
+          </div>
+        </div>
+        <div class="runner-period-bar">
+          <span class="period-label">Report Period</span>
+          <div class="period-selects">
+            <select><option>May</option><option>April</option><option>March</option></select>
+            <select><option>2025</option><option>2024</option><option>2023</option></select>
+          </div>
+        </div>
+        <div class="runner-body">
+          <div class="runner-col">
+            <div class="runner-col-header">
+              <h5>Reports</h5>
+              <input type="text" placeholder="Search...">
+            </div>
+            <div class="runner-list" id="report-list">
+              <div class="runner-report-row" onclick="toggleReport(this, 'Financial Ratios B1-B10')">
+                <span>Financial Ratios B1-B10</span>
+                <button class="runner-add-btn">+</button>
+              </div>
+              <div class="runner-report-row" onclick="toggleReport(this, 'Balance Sheet Summary')">
+                <span>Balance Sheet Summary</span>
+                <button class="runner-add-btn">+</button>
+              </div>
+              <div class="runner-report-row" onclick="toggleReport(this, 'Income Statement')">
+                <span>Income Statement</span>
+                <button class="runner-add-btn">+</button>
+              </div>
+              <div class="runner-report-row" onclick="toggleReport(this, 'Cash Flow Report')">
+                <span>Cash Flow Report</span>
+                <button class="runner-add-btn">+</button>
+              </div>
+              <div class="runner-report-row" onclick="toggleReport(this, 'Loan Ledger')">
+                <span>Loan Ledger</span>
+                <button class="runner-add-btn">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="runner-col">
+            <div class="runner-col-header">
+              <h5>Companies</h5>
+            </div>
+            <div class="company-search-bar">
+              <select><option>Report Name</option><option>Last Name</option><option>Ccode</option></select>
+              <input type="text" placeholder="Search companies...">
+            </div>
+            <div class="runner-list">
+              <table class="company-mini-table">
+                <thead><tr><th>Add</th><th>Name</th><th>Type</th><th>Code</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td><button class="runner-add-btn" onclick="addCompany(this, 'ABC Corporation')">+</button></td><td>ABC Corporation</td><td>LLC</td><td>ABC001</td><td>Active</td></tr>
+                  <tr><td><button class="runner-add-btn" onclick="addCompany(this, 'XYZ Enterprises')">+</button></td><td>XYZ Enterprises</td><td>Corp</td><td>XYZ002</td><td>Active</td></tr>
+                  <tr><td><button class="runner-add-btn" onclick="addCompany(this, 'Smith Consulting')">+</button></td><td>Smith Consulting</td><td>Sole</td><td>SMC003</td><td>Active</td></tr>
+                  <tr><td><button class="runner-add-btn" onclick="addCompany(this, 'Johnson &amp; Sons')">+</button></td><td>Johnson &amp; Sons</td><td>Part</td><td>JNS004</td><td>Active</td></tr>
+                  <tr><td><button class="runner-add-btn" onclick="addCompany(this, 'Williams Group')">+</button></td><td>Williams Group</td><td>LLC</td><td>WLG005</td><td>Active</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="runner-col">
+            <div class="runner-col-header"><h5>Selected (<span id="sel-count">0</span>)</h5></div>
+            <div id="selected-list" style="padding:0.5rem 0; min-height:80px;">
+              <p style="font-size:0.75rem; color:#9ca3af; text-align:center; padding:1.5rem 1rem;">Add reports &amp; companies to get started</p>
+            </div>
+          </div>
+        </div>
+        <div class="runner-footer">
+          <span class="runner-hint" id="run-hint">Select at least one report to run</span>
+          <button class="run-btn" id="run-btn" disabled>Run Reports</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- WHAT CHANGED -->
+<hr class="full-divider">
+<div class="case-section">
+  <p class="section-label">What changed and why</p>
+  <h2 class="section-heading">Every decision had a reason.</h2>
+  <div class="insight-grid">
+    <div class="insight-card before-card">
+      <p class="insight-label before"><span class="insight-dot before"></span>Before — Pain points</p>
+      <ul class="insight-list before">
+        <li>20-column table forced horizontal scrolling to find any company</li>
+        <li>No saved reports — users rebuilt the same config every session</li>
+        <li>Period, filters, and run button scattered with no visual grouping</li>
+        <li>All state visible at once with no progressive disclosure</li>
+        <li>Dense table striping and small fonts increased cognitive load</li>
+        <li>No confirmation of what was selected before running</li>
+      </ul>
+    </div>
+    <div class="insight-card after-card">
+      <p class="insight-label after"><span class="insight-dot after"></span>After — Design decisions</p>
+      <ul class="insight-list after">
+        <li>My Reports page lets users save and reuse configurations in one click</li>
+        <li>Company table trimmed to 5 essential columns — full data still accessible</li>
+        <li>Period selector moved to a persistent top bar — always visible, never lost</li>
+        <li>Two-step flow (select → run) mirrors the user's actual mental model</li>
+        <li>Selected items shown as chips in a dedicated column — clear confirmation</li>
+        <li>Card layout for saved reports makes scanning and acting much faster</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- TAKEAWAYS -->
+<div class="takeaway-section">
+  <div class="takeaway-inner">
+    <p class="section-label">What I learned</p>
+    <h2 class="section-heading">Three things this project taught me.</h2>
+    <div class="takeaway-grid">
+      <div class="takeaway-card">
+        <div class="takeaway-num">01</div>
+        <h4>Know your power users</h4>
+        <p>The original design was built for an administrator who needed every field. But 80% of users just needed name, type, and code. Designing for the common case, not the edge case, made everything simpler.</p>
+      </div>
+      <div class="takeaway-card">
+        <div class="takeaway-num">02</div>
+        <h4>Save state, save time</h4>
+        <p>The biggest UX win wasn't visual — it was the saved report configuration. Users had been manually re-selecting the same 10 companies and 3 reports every day. One feature, massive daily time savings.</p>
+      </div>
+      <div class="takeaway-card">
+        <div class="takeaway-num">03</div>
+        <h4>My dev background is a UX asset</h4>
+        <p>Because I could read the TypeScript, I understood exactly what state existed and how it flowed. That let me redesign the UI to match the data model — not fight against it.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="back-section">
+  <a href="index.html#work" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+    Back to all projects
+  </a>
+</div>
+
+<script>
+  function switchDemo(version) {
+    document.querySelectorAll('.demo-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + version).classList.add('active');
+    document.querySelectorAll('.toggle-btn').forEach(b => { if (b.textContent.toLowerCase() === version) b.classList.add('active'); });
+  }
+
+  function switchAfterPage(page) {
+    const tabs = document.querySelectorAll('.demo-page-tab');
+    tabs[0].classList.toggle('active', page === 'groups');
+    tabs[1].classList.toggle('active', page === 'runner');
+    document.getElementById('after-groups').style.display = page === 'groups' ? 'block' : 'none';
+    document.getElementById('after-runner').style.display = page === 'runner' ? 'block' : 'none';
+    document.getElementById('after-url').textContent = page === 'groups' ? 'localhost:4200/report-groups' : 'localhost:4200/report-runner';
+  }
+
+  const selectedReports = new Set();
+  const selectedCompanies = new Set();
+
+  function updateRunBtn() {
+    const count = selectedReports.size + selectedCompanies.size;
+    document.getElementById('sel-count').textContent = count;
+    const btn = document.getElementById('run-btn');
+    const hint = document.getElementById('run-hint');
+    if (selectedReports.size > 0 && selectedCompanies.size > 0) {
+      btn.disabled = false;
+      hint.textContent = selectedReports.size + ' report(s) · ' + selectedCompanies.size + ' company(s)';
+    } else if (selectedReports.size === 0) {
+      btn.disabled = true; hint.textContent = 'Select at least one report to run';
+    } else {
+      btn.disabled = true; hint.textContent = 'Select at least one company to run';
+    }
+    renderSelected();
+  }
+
+  function renderSelected() {
+    const list = document.getElementById('selected-list');
+    if (selectedReports.size === 0 && selectedCompanies.size === 0) {
+      list.innerHTML = '<p style="font-size:0.75rem;color:#9ca3af;text-align:center;padding:1.5rem 1rem;">Add reports & companies</p>';
+      return;
+    }
+    list.innerHTML = '';
+    selectedReports.forEach(name => {
+      list.innerHTML += `<div class="selected-chip"><span>📄 ${name}</span><button onclick="removeSelected('report','${name}')">×</button></div>`;
+    });
+    selectedCompanies.forEach(name => {
+      list.innerHTML += `<div class="selected-chip" style="background:#f0fdf4;border-color:#bbf7d0;"><span style="color:#15803d;">🏢 ${name}</span><button onclick="removeSelected('company','${name}')">×</button></div>`;
+    });
+  }
+
+  function removeSelected(type, name) {
+    if (type === 'report') {
+      selectedReports.delete(name);
+      document.querySelectorAll('#report-list .runner-add-btn').forEach(btn => {
+        if (btn.closest('.runner-report-row').querySelector('span').textContent === name) {
+          btn.classList.remove('added'); btn.textContent = '+';
+        }
+      });
+    } else {
+      selectedCompanies.delete(name);
+    }
+    updateRunBtn();
+  }
+
+  function toggleReport(row, name) {
+    const btn = row.querySelector('.runner-add-btn');
+    if (selectedReports.has(name)) { selectedReports.delete(name); btn.classList.remove('added'); btn.textContent = '+'; }
+    else { selectedReports.add(name); btn.classList.add('added'); btn.textContent = '✓'; }
+    updateRunBtn();
+  }
+
+  function addCompany(btn, name) {
+    if (!selectedCompanies.has(name)) { selectedCompanies.add(name); btn.classList.add('added'); btn.textContent = '✓'; }
+    updateRunBtn();
+  }
+
+  document.getElementById('run-btn').addEventListener('click', function() {
+    if (!this.disabled) { this.textContent = 'Running...'; setTimeout(() => { this.textContent = '✓ Done!'; this.style.background = '#16a34a'; }, 1200); }
+  });
+</script>
+</body>
+</html>
