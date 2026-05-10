@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pony Express — Cynthia Lancaster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --lime: #C8F135; --lime-dark: #9DC418;
+      --ink: #1A1A18; --paper: #F5F2EB;
+      --muted: #7A7A72; --border: rgba(26,26,24,0.12); --radius: 20px;
+      --blue: #3B82F6; --blue-dark: #1D4ED8;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); line-height: 1.6; overflow-x: hidden; }
+
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 3rem; border-bottom: 1px solid var(--border); background: var(--paper); position: sticky; top: 0; z-index: 200; }
+    .nav-logo { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; text-decoration: none; color: var(--ink); }
+    .nav-back { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--muted); font-size: 0.85rem; }
+    .nav-back:hover { color: var(--ink); }
+
+    .case-hero { padding: 5rem 3rem 4rem; max-width: 1100px; margin: 0 auto; }
+    .eyebrow { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow::before { content: ''; width: 32px; height: 2px; background: var(--lime-dark); display: inline-block; }
+    .case-title { font-family: 'Fraunces', serif; font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 1.5rem; }
+    .case-title em { font-style: italic; color: var(--lime-dark); }
+    .case-sub { font-size: 1.1rem; color: var(--muted); max-width: 600px; line-height: 1.7; margin-bottom: 3rem; }
+    .case-meta { display: flex; gap: 3rem; flex-wrap: wrap; }
+    .meta-item label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.25rem; }
+    .meta-item span { font-size: 0.95rem; font-weight: 500; }
+
+    .case-section { padding: 5rem 3rem; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section-heading { font-family: 'Fraunces', serif; font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .prose { color: var(--muted); font-size: 1rem; line-height: 1.8; max-width: 680px; }
+    .prose + .prose { margin-top: 1rem; }
+    .full-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+    /* tech stack */
+    .stack-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-top: 2.5rem; }
+    .stack-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center; }
+    .stack-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .stack-layer { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.25rem; }
+    .stack-name { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.35rem; }
+    .stack-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+    /* features */
+    .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 2.5rem; }
+    .feature-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; }
+    .feature-tag { display: inline-block; background: #E8F5C8; color: #4A6B10; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.2rem 0.65rem; border-radius: 100px; margin-bottom: 0.75rem; }
+    .feature-card h4 { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .feature-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+
+    /* demo wrapper */
+    .demo-outer { padding: 0 3rem 5rem; max-width: 1100px; margin: 0 auto; }
+    .demo-label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    .demo-callout { background: var(--lime); border-radius: 100px; padding: 0.4rem 1rem; font-size: 0.78rem; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 0.4rem; }
+
+    /* app shell */
+    .app-shell { border-radius: 16px; overflow: hidden; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 24px 80px rgba(0,0,0,0.12); background: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .app-chrome { background: #f3f4f6; padding: 0.6rem 1rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid #e5e7eb; }
+    .chrome-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .chrome-dot.r { background: #FF5F57; } .chrome-dot.y { background: #FFBD2E; } .chrome-dot.g { background: #28C840; }
+    .chrome-url { background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.2rem 0.9rem; font-size: 0.72rem; color: #6b7280; margin: 0 auto; font-family: monospace; min-width: 280px; text-align: center; }
+
+    /* screens */
+    .screen { display: none; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* LOGIN SCREEN */
+    .login-screen { background: #f9fafb; min-height: 540px; align-items: center; justify-content: center; }
+    .login-box { background: #e5e7eb; border-radius: 8px; padding: 2rem; width: 100%; max-width: 380px; }
+    .app-brand { text-align: center; font-size: 2rem; font-weight: 900; margin-bottom: 1.5rem; color: #111; }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+    .form-group label { font-size: 0.8rem; font-weight: 500; color: #374151; }
+    .form-group input { border: 1px solid #d1d5db; border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.88rem; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+    .form-group input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+    .btn-blue { width: 100%; background: var(--blue); color: #fff; border: none; border-radius: 6px; padding: 0.6rem; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .btn-blue:hover { background: var(--blue-dark); }
+    .btn-blue:disabled { background: #9ca3af; cursor: not-allowed; }
+    .form-footer { text-align: center; margin-top: 1rem; font-size: 0.8rem; color: var(--blue); cursor: pointer; }
+    .form-footer:hover { color: var(--blue-dark); }
+    .form-error { color: #ef4444; font-size: 0.78rem; margin-bottom: 0.5rem; }
+
+    /* SIGNUP SCREEN */
+    .signup-screen { background: #f9fafb; min-height: 540px; align-items: center; justify-content: center; }
+
+    /* MAIN APP SCREEN */
+    .main-screen { min-height: 540px; flex-direction: row !important; }
+    .sidebar { width: 25%; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; overflow: hidden; }
+    .sidebar-chats { flex: 1; overflow-y: auto; padding: 1rem; border-bottom: 1px solid #e5e7eb; }
+    .sidebar-settings { padding: 1rem; }
+    .sidebar-title { font-size: 1.5rem; font-weight: 900; text-align: center; padding: 0.5rem 0 0.75rem; border-bottom: 1px solid #e5e7eb; margin-bottom: 0.75rem; }
+    .sidebar-section-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 0.5rem; }
+    .chat-link { display: block; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer; margin-bottom: 2px; transition: background 0.1s, color 0.1s; }
+    .chat-link:hover { background: #111; color: #fff; }
+    .chat-link.active { background: var(--blue); color: #fff; font-weight: 700; }
+    .settings-link { display: block; padding: 0.3rem 0.75rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; margin-bottom: 2px; transition: background 0.1s, color 0.1s; }
+    .settings-link:hover { background: #111; color: #fff; }
+    .settings-link.active { background: var(--blue); color: #fff; font-weight: 700; }
+    .settings-username { font-weight: 700; font-size: 0.85rem; margin-bottom: 0.5rem; }
+    .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* CHAT MESSAGES */
+    .chat-content { display: none; flex-direction: column; height: 100%; }
+    .chat-content.active { display: flex; }
+    .messages-area { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; background: #f9fafb; }
+    .msg-bubble { background: #fff; border-radius: 10px; padding: 0.75rem 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .msg-header { font-weight: 600; font-size: 0.78rem; color: #374151; margin-bottom: 0.25rem; display: flex; align-items: center; justify-content: space-between; }
+    .msg-header .msg-meta { color: #9ca3af; font-weight: 400; }
+    .msg-text { font-size: 0.88rem; color: #111; }
+    .msg-actions { display: flex; gap: 0.4rem; margin-top: 0.5rem; }
+    .msg-btn { padding: 2px 10px; border-radius: 5px; border: none; cursor: pointer; font-size: 0.72rem; font-weight: 500; }
+    .msg-btn.edit { background: #fef08a; color: #111; }
+    .msg-btn.edit:hover { background: #fde047; }
+    .msg-btn.del { background: #fca5a5; color: #fff; }
+    .msg-btn.del:hover { background: #f87171; }
+    .msg-btn.save { background: #6ee7b7; color: #111; }
+    .msg-btn.cancel { background: #e5e7eb; color: #111; }
+    .msg-editing { font-size: 0.78rem; font-weight: 600; color: #6b7280; margin-bottom: 0.35rem; }
+    .msg-edit-input { width: 100%; border: 1px solid #d1d5db; border-radius: 6px; padding: 0.35rem 0.5rem; font-size: 0.85rem; margin-bottom: 0.35rem; }
+    .no-messages { text-align: center; color: #9ca3af; font-size: 1rem; font-weight: 600; padding: 3rem; }
+    .send-form { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-top: 1px solid #e5e7eb; background: #fff; }
+    .send-input { flex: 1; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.88rem; outline: none; }
+    .send-input:focus { border-color: var(--blue); }
+    .send-btn { background: var(--blue); color: #fff; border: none; border-radius: 6px; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+    .send-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+    .send-btn:not(:disabled):hover { background: var(--blue-dark); }
+
+    /* SETTINGS PANELS */
+    .settings-panel { display: none; padding: 2rem; flex-direction: column; }
+    .settings-panel.active { display: flex; }
+    .settings-form { background: #e5e7eb; border-radius: 8px; padding: 1.5rem; max-width: 380px; }
+    .settings-title { font-size: 1.8rem; font-weight: 900; text-align: center; margin-bottom: 1.25rem; }
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #9ca3af; text-align: center; padding: 3rem; gap: 0.75rem; }
+    .empty-icon { font-size: 3rem; }
+
+    /* demo tip */
+    .demo-tip { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 0.75rem 1.25rem; font-size: 0.82rem; color: #1d4ed8; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+
+    /* run it yourself */
+    .run-section { background: #0F1117; padding: 5rem 3rem; }
+    .run-inner { max-width: 1100px; margin: 0 auto; }
+    .run-section .section-label { color: rgba(255,255,255,0.35); }
+    .run-section .section-label::after { background: rgba(255,255,255,0.08); }
+    .run-section .section-heading { color: #fff; margin-bottom: 0.75rem; }
+    .run-section .prose { color: rgba(255,255,255,0.45); margin-bottom: 2.5rem; }
+
+    .run-steps { display: flex; flex-direction: column; gap: 0; }
+    .run-step { border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; margin-bottom: 1rem; }
+    .run-step-header { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 1.5rem; background: rgba(255,255,255,0.04); cursor: pointer; user-select: none; transition: background 0.15s; }
+    .run-step-header:hover { background: rgba(255,255,255,0.07); }
+    .run-step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--lime); color: var(--ink); font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .run-step-title { font-size: 0.95rem; font-weight: 600; color: #fff; flex: 1; }
+    .run-step-chevron { color: rgba(255,255,255,0.3); font-size: 0.75rem; transition: transform 0.2s; }
+    .run-step.open .run-step-chevron { transform: rotate(180deg); }
+    .run-step-body { display: none; padding: 1.25rem 1.5rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.06); }
+    .run-step.open .run-step-body { display: block; }
+    .run-step-desc { font-size: 0.85rem; color: rgba(255,255,255,0.45); line-height: 1.7; margin-bottom: 1.1rem; }
+    .run-step-desc a { color: var(--lime); text-decoration: none; }
+    .run-step-desc a:hover { text-decoration: underline; }
+
+    .code-block { background: #1a1d27; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; margin-top: 0.75rem; }
+    .code-block-header { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 1rem; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .code-block-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+    .code-copy-btn { font-size: 0.68rem; background: transparent; border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); border-radius: 4px; padding: 2px 8px; cursor: pointer; transition: all 0.15s; }
+    .code-copy-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .code-block pre { padding: 1rem 1.25rem; font-size: 0.82rem; font-family: 'SF Mono', 'Fira Code', monospace; color: #e2e8f0; overflow-x: auto; line-height: 1.7; }
+    .code-block pre .comment { color: #4a5568; }
+    .code-block pre .cmd { color: var(--lime); }
+    .code-block pre .str { color: #68d391; }
+
+    .prereq-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.25rem; }
+    .prereq-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.85rem 1rem; }
+    .prereq-card h5 { font-size: 0.82rem; font-weight: 600; color: #fff; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem; }
+    .prereq-card p { font-size: 0.73rem; color: rgba(255,255,255,0.35); }
+    .prereq-card a { color: var(--lime); text-decoration: none; font-size: 0.73rem; }
+
+    .run-note { display: flex; align-items: flex-start; gap: 0.6rem; background: rgba(200,241,53,0.07); border: 1px solid rgba(200,241,53,0.2); border-radius: 8px; padding: 0.75rem 1rem; margin-top: 1rem; }
+    .run-note p { font-size: 0.8rem; color: rgba(255,255,255,0.5); line-height: 1.6; }
+    .run-note span { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+    .github-cta { display: inline-flex; align-items: center; gap: 0.6rem; background: #fff; color: var(--ink); padding: 0.75rem 1.5rem; border-radius: 100px; text-decoration: none; font-weight: 600; font-size: 0.88rem; margin-top: 2rem; transition: transform 0.2s, box-shadow 0.2s; }
+    .github-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+
+    /* takeaways */
+    .takeaway-section { background: var(--ink); color: #fff; padding: 5rem 3rem; }
+    .takeaway-inner { max-width: 1100px; margin: 0 auto; }
+    .takeaway-section .section-label { color: rgba(255,255,255,0.4); }
+    .takeaway-section .section-label::after { background: rgba(255,255,255,0.1); }
+    .takeaway-section .section-heading { color: #fff; }
+    .takeaway-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2.5rem; }
+    .takeaway-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius); padding: 1.75rem; }
+    .takeaway-num { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 700; color: var(--lime); margin-bottom: 0.75rem; }
+    .takeaway-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .takeaway-card p { font-size: 0.83rem; color: rgba(255,255,255,0.5); line-height: 1.65; }
+
+    .back-section { padding: 3rem; text-align: center; }
+    .back-link { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--muted); font-size: 0.9rem; }
+    .back-link:hover { color: var(--ink); }
+
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .case-hero, .case-section { padding: 3rem 1.5rem; }
+      .demo-outer { padding: 0 1.5rem 3rem; }
+      .stack-grid { grid-template-columns: 1fr 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .takeaway-grid { grid-template-columns: 1fr; }
+      .takeaway-section { padding: 3rem 1.5rem; }
+      .sidebar { width: 35%; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Cynthia Lancaster.</a>
+  <a href="index.html#work" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+    Back to portfolio
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="case-hero">
+  <p class="eyebrow">Case Study · Full-Stack Chat Application</p>
+  <h1 class="case-title">Pony Express —<br>built <em>end to end.</em></h1>
+  <p class="case-sub">A complete real-time chat application I designed and built entirely from scratch — React frontend, Python/FastAPI backend, and PostgreSQL database. Every layer, every decision, all me.</p>
+  <div class="case-meta">
+    <div class="meta-item"><label>Role</label><span>Full-Stack Developer + Designer</span></div>
+    <div class="meta-item"><label>Frontend</label><span>React + Tailwind</span></div>
+    <div class="meta-item"><label>Backend</label><span>Python / FastAPI</span></div>
+    <div class="meta-item"><label>Database</label><span>PostgreSQL</span></div>
+    <div class="meta-item"><label>Auth</label><span>JWT Bearer tokens</span></div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- TECH STACK -->
+<div class="case-section">
+  <p class="section-label">The stack</p>
+  <h2 class="section-heading">Every layer, designed and built from scratch.</h2>
+  <p class="prose">Most designers hand off to developers. I am the developer. Building the entire stack myself meant every design decision was grounded in technical reality — and every technical decision was informed by the user experience.</p>
+  <div class="stack-grid">
+    <div class="stack-card">
+      <div class="stack-icon">⚛️</div>
+      <div class="stack-layer">Frontend</div>
+      <div class="stack-name">React + Tailwind</div>
+      <p class="stack-desc">Component-based UI with React Router for navigation and TanStack Query for data fetching.</p>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🐍</div>
+      <div class="stack-layer">Backend</div>
+      <div class="stack-name">Python / FastAPI</div>
+      <p class="stack-desc">REST API with JWT authentication, protected routes, and full CRUD for accounts, chats, and messages.</p>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🗄️</div>
+      <div class="stack-layer">Database</div>
+      <div class="stack-name">PostgreSQL</div>
+      <p class="stack-desc">Relational database storing users, chat rooms, and messages with proper foreign key relationships.</p>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🔐</div>
+      <div class="stack-layer">Auth</div>
+      <div class="stack-name">JWT Tokens</div>
+      <p class="stack-desc">Secure login flow issuing Bearer tokens stored in localStorage. Protected routes redirect unauthenticated users.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- FEATURES -->
+<div class="case-section">
+  <p class="section-label">What it does</p>
+  <h2 class="section-heading">A fully working chat platform.</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="feature-tag">Authentication</span>
+      <h4>Register, login, stay logged in</h4>
+      <p>Full registration and login flow with JWT tokens. Auth state persists across page refreshes via localStorage. Protected routes redirect unauthenticated users automatically.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-tag">Messaging</span>
+      <h4>Send, edit, and delete messages</h4>
+      <p>Real-time message display with auto-scroll to the latest message. Users can edit or delete their own messages inline. Other users' messages are read-only.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-tag">Chat rooms</span>
+      <h4>Multiple rooms, membership control</h4>
+      <p>Browse a list of chat rooms from the sidebar. Membership is checked server-side — only members can send messages. Non-members can read but not participate.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-tag">Account management</span>
+      <h4>Update profile, password, delete account</h4>
+      <p>Full account settings: update username and email, change password with current password verification, or permanently delete the account with a single confirmation.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- INTERACTIVE DEMO -->
+<div class="case-section" style="padding-bottom: 2rem;">
+  <p class="section-label">Interactive demo</p>
+  <h2 class="section-heading">Try the real interface.</h2>
+  <p class="prose">This is a faithful simulation of the actual app — same layout, same flows, same interactions. No backend needed. Try logging in, switching chats, sending messages, editing them, and exploring the settings.</p>
+</div>
+
+<div class="demo-outer">
+  <div class="demo-tip">
+    💡 <strong>Demo credentials:</strong> username <code>cynthia</code> · password <code>ponyexpress</code> — or use any username/password to register
+  </div>
+
+  <div class="app-shell">
+    <div class="app-chrome">
+      <div class="chrome-dot r"></div>
+      <div class="chrome-dot y"></div>
+      <div class="chrome-dot g"></div>
+      <div class="chrome-url" id="url-bar">localhost:5173/login</div>
+    </div>
+
+    <!-- LOGIN SCREEN -->
+    <div class="screen login-screen active" id="screen-login">
+      <div class="login-box">
+        <div class="app-brand">Pony Express</div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="login-username" placeholder="Enter username" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="Enter password">
+        </div>
+        <div class="form-error" id="login-error" style="display:none;"></div>
+        <button class="btn-blue" id="login-btn" onclick="handleLogin()" disabled>Log In</button>
+        <div class="form-footer" onclick="goToSignup()">Don't have an account? Register</div>
+      </div>
+    </div>
+
+    <!-- SIGNUP SCREEN -->
+    <div class="screen signup-screen" id="screen-signup">
+      <div class="login-box">
+        <div class="app-brand">Pony Express</div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="su-username" placeholder="Choose a username" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="su-email" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="su-password" placeholder="Create a password">
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" id="su-confirm" placeholder="Repeat password">
+        </div>
+        <div class="form-error" id="su-error" style="display:none;"></div>
+        <button class="btn-blue" id="signup-btn" onclick="handleSignup()" disabled>Sign Up</button>
+        <div class="form-footer" onclick="goToLogin()">Already have an account? Login</div>
+      </div>
+    </div>
+
+    <!-- MAIN APP SCREEN -->
+    <div class="screen main-screen" id="screen-main">
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <div class="sidebar-chats">
+          <div class="sidebar-title">Pony Express</div>
+          <div class="sidebar-section-title">Chats</div>
+          <div id="chat-list"></div>
+        </div>
+        <div class="sidebar-settings">
+          <div class="sidebar-section-title">Settings</div>
+          <div class="settings-username" id="settings-username"></div>
+          <div class="settings-link" onclick="handleLogout()">Logout</div>
+          <div class="settings-link" onclick="showSettings('update-account')" id="link-update-account">Update Account</div>
+          <div class="settings-link" onclick="showSettings('update-password')" id="link-update-password">Update Password</div>
+          <div class="settings-link" onclick="showSettings('manage-account')" id="link-manage-account">Manage Account</div>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <div class="main-content">
+
+        <!-- Empty state -->
+        <div class="chat-content active" id="chat-empty">
+          <div class="empty-state">
+            <div class="empty-icon">💬</div>
+            <p style="font-weight:600; color:#374151;">Select a chat to get started</p>
+            <p style="font-size:0.82rem;">Choose a conversation from the sidebar</p>
+          </div>
+        </div>
+
+        <!-- Chat views (one per chat) -->
+        <div class="chat-content" id="chat-view-1">
+          <div class="messages-area" id="messages-1"></div>
+          <form class="send-form" onsubmit="sendMessage(event,1)">
+            <input class="send-input" id="input-1" type="text" placeholder="New message..." oninput="updateSendBtn(1)">
+            <button class="send-btn" id="send-btn-1" type="submit" disabled>Send</button>
+          </form>
+        </div>
+        <div class="chat-content" id="chat-view-2">
+          <div class="messages-area" id="messages-2"></div>
+          <form class="send-form" onsubmit="sendMessage(event,2)">
+            <input class="send-input" id="input-2" type="text" placeholder="New message..." oninput="updateSendBtn(2)">
+            <button class="send-btn" id="send-btn-2" type="submit" disabled>Send</button>
+          </form>
+        </div>
+        <div class="chat-content" id="chat-view-3">
+          <div class="messages-area" id="messages-3"></div>
+          <form class="send-form" onsubmit="sendMessage(event,3)">
+            <input class="send-input" id="input-3" type="text" placeholder="New message..." oninput="updateSendBtn(3)">
+            <button class="send-btn" id="send-btn-3" type="submit" disabled>Send</button>
+          </form>
+        </div>
+
+        <!-- Settings panels -->
+        <div class="settings-panel" id="panel-update-account">
+          <div class="settings-title">Update Account</div>
+          <div class="settings-form">
+            <div class="form-group"><label>Username</label><input type="text" id="ua-username"></div>
+            <div class="form-group"><label>Email</label><input type="email" id="ua-email" value="cynthia@email.com"></div>
+            <button class="btn-blue" onclick="showToast('Account updated!')">Update</button>
+          </div>
+        </div>
+
+        <div class="settings-panel" id="panel-update-password">
+          <div class="settings-title">Update Password</div>
+          <div class="settings-form">
+            <div class="form-group"><label>Current Password</label><input type="password" placeholder="Current password"></div>
+            <div class="form-group"><label>New Password</label><input type="password" placeholder="New password"></div>
+            <div class="form-group"><label>Confirm New Password</label><input type="password" placeholder="Confirm new password"></div>
+            <button class="btn-blue" onclick="showToast('Password updated!')">Update Password</button>
+          </div>
+        </div>
+
+        <div class="settings-panel" id="panel-manage-account">
+          <div class="settings-title">Manage Account</div>
+          <div class="settings-form" style="display:flex; flex-direction:column; gap:0.75rem;">
+            <button class="btn-blue" onclick="handleLogout()">Logout</button>
+            <button class="btn-blue" style="background:#ef4444;" onclick="handleLogout()">Delete Account</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- end app-shell -->
+
+  <!-- Toast -->
+  <div id="toast" style="position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(80px); background:var(--ink); color:#fff; padding:0.65rem 1.5rem; border-radius:100px; font-size:0.85rem; font-weight:500; transition:transform 0.3s; z-index:999; pointer-events:none;">Saved!</div>
+</div>
+
+<hr class="full-divider">
+
+<!-- RUN IT YOURSELF -->
+<div class="run-section">
+  <div class="run-inner">
+    <p class="section-label">Run it yourself</p>
+    <h2 class="section-heading">Want to run the full app locally?</h2>
+    <p class="prose">The complete source code — frontend, backend, and database setup — is on GitHub. Follow the steps below to get everything running on your machine in about 5 minutes.</p>
+
+    <a class="github-cta" href="https://github.com/cynthia-lancaster-485/Portfolio" target="_blank">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      View on GitHub ↗
+    </a>
+
+    <div style="margin-top: 2.5rem;">
+      <div class="run-steps">
+
+        <!-- STEP 1 -->
+        <div class="run-step open">
+          <div class="run-step-header" onclick="toggleStep(this)">
+            <div class="run-step-num">1</div>
+            <div class="run-step-title">Prerequisites — install these first</div>
+            <div class="run-step-chevron">▼</div>
+          </div>
+          <div class="run-step-body">
+            <p class="run-step-desc">Make sure you have these installed before you start. Click each link for the official installer.</p>
+            <div class="prereq-grid">
+              <div class="prereq-card">
+                <h5>🟢 Node.js</h5>
+                <p>Version 20 or higher</p>
+                <a href="https://nodejs.org" target="_blank">nodejs.org ↗</a>
+              </div>
+              <div class="prereq-card">
+                <h5>🐍 Python</h5>
+                <p>Version 3.11 or higher</p>
+                <a href="https://python.org" target="_blank">python.org ↗</a>
+              </div>
+              <div class="prereq-card">
+                <h5>📦 Poetry</h5>
+                <p>Python package manager</p>
+                <a href="https://python-poetry.org/docs/#installation" target="_blank">Install Poetry ↗</a>
+              </div>
+            </div>
+            <div class="run-note">
+              <span>💡</span>
+              <p>To check if something is installed, open your terminal and run <code style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:3px;">node --version</code>, <code style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:3px;">python --version</code>, or <code style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:3px;">poetry --version</code>.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="run-step">
+          <div class="run-step-header" onclick="toggleStep(this)">
+            <div class="run-step-num">2</div>
+            <div class="run-step-title">Clone the repository</div>
+            <div class="run-step-chevron">▼</div>
+          </div>
+          <div class="run-step-body">
+            <p class="run-step-desc">Download the code to your machine using Git. Open your terminal and run:</p>
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-label">Terminal</span>
+                <button class="code-copy-btn" onclick="copyCode(this, 'git clone https://github.com/cynthia-lancaster-485/Portfolio.git\ncd Portfolio/Chat\\ Application')">Copy</button>
+              </div>
+              <pre><span class="comment"># Clone the repo</span>
+<span class="cmd">git clone</span> <span class="str">https://github.com/cynthia-lancaster-485/Portfolio.git</span>
+
+<span class="comment"># Navigate into the Chat Application folder</span>
+<span class="cmd">cd</span> <span class="str">"Portfolio/Chat Application"</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="run-step">
+          <div class="run-step-header" onclick="toggleStep(this)">
+            <div class="run-step-num">3</div>
+            <div class="run-step-title">Set up and run the backend</div>
+            <div class="run-step-chevron">▼</div>
+          </div>
+          <div class="run-step-body">
+            <p class="run-step-desc">Install Python dependencies with Poetry, then start the FastAPI server. Run these from the project root (inside the Chat Application folder):</p>
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-label">Terminal — Backend</span>
+                <button class="code-copy-btn" onclick="copyCode(this, 'poetry install\npoetry run uvicorn backend:app --reload')">Copy</button>
+              </div>
+              <pre><span class="comment"># Install all Python dependencies</span>
+<span class="cmd">poetry install</span>
+
+<span class="comment"># Start the backend server</span>
+<span class="cmd">poetry run uvicorn</span> backend:app <span class="str">--reload</span></pre>
+            </div>
+            <div class="run-note">
+              <span>✅</span>
+              <p>The backend will be running at <code style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:3px;">http://127.0.0.1:8000</code>. You can explore the auto-generated API docs at <code style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:3px;">http://127.0.0.1:8000/docs</code> — one of FastAPI's best features!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="run-step">
+          <div class="run-step-header" onclick="toggleStep(this)">
+            <div class="run-step-num">4</div>
+            <div class="run-step-title">Set up and run the frontend</div>
+            <div class="run-step-chevron">▼</div>
+          </div>
+          <div class="run-step-body">
+            <p class="run-step-desc">Open a <strong style="color:#fff;">second terminal window</strong> (keep the backend running), navigate into the frontend folder, and start the Vite dev server:</p>
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-label">Terminal — Frontend (new window)</span>
+                <button class="code-copy-btn" onclick="copyCode(this, 'cd frontend\nnpm install\nnpm run dev')">Copy</button>
+              </div>
+              <pre><span class="comment"># Move into the frontend folder</span>
+<span class="cmd">cd</span> <span class="str">frontend</span>
+
+<span class="comment"># Install Node dependencies</span>
+<span class="cmd">npm install</span>
+
+<span class="comment"># Start the frontend dev server</span>
+<span class="cmd">npm run dev</span></pre>
+            </div>
+            <div class="run-note">
+              <span>🚀</span>
+              <p>The app will be live at <code style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:3px;">http://localhost:5173</code>. Open that in your browser and you'll see the full Pony Express app running with a real backend and database!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 5 -->
+        <div class="run-step">
+          <div class="run-step-header" onclick="toggleStep(this)">
+            <div class="run-step-num">5</div>
+            <div class="run-step-title">Create an account and start chatting</div>
+            <div class="run-step-chevron">▼</div>
+          </div>
+          <div class="run-step-body">
+            <p class="run-step-desc">Once both servers are running, visit <a href="http://localhost:5173" target="_blank">localhost:5173</a> in your browser. Click <strong style="color:#fff;">"Don't have an account? Register"</strong> to create a new account, then log in and start exploring. Open a second browser window with a different account to chat between two users in real time!</p>
+            <div class="run-note">
+              <span>🧪</span>
+              <p>The API docs at <a href="http://127.0.0.1:8000/docs" target="_blank" style="color:var(--lime);">127.0.0.1:8000/docs ↗</a> let you explore and test every endpoint directly — great for seeing how the backend is structured.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- TAKEAWAYS -->
+<div class="takeaway-section">
+  <div class="takeaway-inner">
+    <p class="section-label">What I learned</p>
+    <h2 class="section-heading">Building end-to-end changes how you design.</h2>
+    <div class="takeaway-grid">
+      <div class="takeaway-card">
+        <div class="takeaway-num">01</div>
+        <h4>Auth is a UX problem</h4>
+        <p>JWT tokens, protected routes, and persistent sessions aren't just backend concerns — every decision affects what the user experiences. Designing the auth flow meant thinking about it from both sides simultaneously.</p>
+      </div>
+      <div class="takeaway-card">
+        <div class="takeaway-num">02</div>
+        <h4>Owning the whole stack = faster iteration</h4>
+        <p>When the designer and developer are the same person, there's no handoff delay, no misinterpretation, no "that's not possible." I could change the API contract and update the UI in the same commit.</p>
+      </div>
+      <div class="takeaway-card">
+        <div class="takeaway-num">03</div>
+        <h4>State management is invisible UX</h4>
+        <p>Getting auth context, message lists, and membership checks to stay in sync is invisible when it works and infuriating when it doesn't. Building it taught me to design with state in mind from the very start.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="back-section">
+  <a href="index.html#work" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+    Back to all projects
+  </a>
+</div>
+
+<script>
+  /* ── DATA ── */
+  const DEMO_USER = { username: 'cynthia', password: 'ponyexpress', email: 'cynthia@email.com' };
+  const chats = [
+    { id: 1, name: 'General' },
+    { id: 2, name: 'Design Talk' },
+    { id: 3, name: 'Dev Lounge' },
+  ];
+  const initMessages = {
+    1: [
+      { id: 1, account_id: 'alex', username: 'alex', text: 'Hey everyone! Welcome to General 👋', ts: '9:01 AM' },
+      { id: 2, account_id: 'maya', username: 'maya', text: 'Thanks for setting this up! Really excited to be here.', ts: '9:03 AM' },
+      { id: 3, account_id: 'alex', username: 'alex', text: 'Feel free to share anything here — no rules except be kind!', ts: '9:05 AM' },
+    ],
+    2: [
+      { id: 1, account_id: 'maya', username: 'maya', text: 'Anyone using Figma\'s new variables feature? It\'s a game changer for design systems.', ts: '10:12 AM' },
+      { id: 2, account_id: 'jordan', username: 'jordan', text: 'Yes! Finally proper token support. I\'ve been waiting for this forever.', ts: '10:14 AM' },
+      { id: 3, account_id: 'maya', username: 'maya', text: 'The mode switching is so smooth for light/dark themes too.', ts: '10:16 AM' },
+    ],
+    3: [
+      { id: 1, account_id: 'jordan', username: 'jordan', text: 'FastAPI or Express for a new project? I keep going back and forth.', ts: '2:00 PM' },
+      { id: 2, account_id: 'alex', username: 'alex', text: 'FastAPI if you\'re comfortable with Python. The auto-generated docs alone are worth it.', ts: '2:02 PM' },
+      { id: 3, account_id: 'jordan', username: 'jordan', text: 'Good point. The OpenAPI spec out of the box is really nice.', ts: '2:04 PM' },
+    ],
+  };
+
+  let messages = { 1: [...initMessages[1]], 2: [...initMessages[2]], 3: [...initMessages[3]] };
+  let loggedInUser = null;
+  let nextMsgId = { 1: 10, 2: 10, 3: 10 };
+  let editingId = { 1: null, 2: null, 3: null };
+  let activeChat = null;
+
+  /* ── SCREENS ── */
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+    const urls = { login: 'localhost:5173/login', signup: 'localhost:5173/register', main: 'localhost:5173/' };
+    document.getElementById('url-bar').textContent = urls[id] || 'localhost:5173/';
+  }
+
+  /* ── LOGIN ── */
+  ['login-username','login-password'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      const u = document.getElementById('login-username').value.trim();
+      const p = document.getElementById('login-password').value.trim();
+      document.getElementById('login-btn').disabled = !(u && p);
+    });
+  });
+
+  function handleLogin() {
+    const u = document.getElementById('login-username').value.trim();
+    const p = document.getElementById('login-password').value.trim();
+    const err = document.getElementById('login-error');
+    if ((u === DEMO_USER.username && p === DEMO_USER.password) || (u && p)) {
+      loggedInUser = { username: u, email: DEMO_USER.email };
+      err.style.display = 'none';
+      enterApp();
+    } else {
+      err.textContent = 'Invalid username or password';
+      err.style.display = 'block';
+    }
+  }
+
+  /* ── SIGNUP ── */
+  ['su-username','su-email','su-password','su-confirm'].forEach(id => {
+    document.getElementById(id).addEventListener('input', validateSignup);
+  });
+  function validateSignup() {
+    const u = document.getElementById('su-username').value.trim();
+    const e = document.getElementById('su-email').value.trim();
+    const p = document.getElementById('su-password').value.trim();
+    const c = document.getElementById('su-confirm').value.trim();
+    document.getElementById('signup-btn').disabled = !(u && e && p && p === c);
+  }
+  function handleSignup() {
+    const u = document.getElementById('su-username').value.trim();
+    const e = document.getElementById('su-email').value.trim();
+    const err = document.getElementById('su-error');
+    if (!u || !e) { err.textContent = 'Please fill all fields'; err.style.display='block'; return; }
+    loggedInUser = { username: u, email: e };
+    err.style.display = 'none';
+    enterApp();
+  }
+
+  function goToSignup() { showScreen('signup'); }
+  function goToLogin() { showScreen('login'); }
+
+  /* ── ENTER APP ── */
+  function enterApp() {
+    document.getElementById('settings-username').textContent = loggedInUser.username;
+    document.getElementById('ua-username').value = loggedInUser.username;
+    document.getElementById('ua-email').value = loggedInUser.email;
+    renderChatList();
+    showScreen('main');
+    document.getElementById('url-bar').textContent = 'localhost:5173/';
+  }
+
+  function renderChatList() {
+    const el = document.getElementById('chat-list');
+    el.innerHTML = chats.map(c => `
+      <div class="chat-link" id="chat-link-${c.id}" onclick="openChat(${c.id})">${c.name}</div>
+    `).join('');
+  }
+
+  /* ── OPEN CHAT ── */
+  function openChat(chatId) {
+    activeChat = chatId;
+    document.querySelectorAll('.chat-link').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.settings-link').forEach(l => l.classList.remove('active'));
+    document.getElementById('chat-link-' + chatId).classList.add('active');
+    document.querySelectorAll('.chat-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('chat-view-' + chatId).classList.add('active');
+    document.getElementById('url-bar').textContent = `localhost:5173/chats/${chatId}`;
+    renderMessages(chatId);
+    scrollToBottom(chatId);
+  }
+
+  /* ── RENDER MESSAGES ── */
+  function renderMessages(chatId) {
+    const container = document.getElementById('messages-' + chatId);
+    const msgs = messages[chatId];
+    if (!msgs || msgs.length === 0) {
+      container.innerHTML = '<div class="no-messages">No chat messages</div>';
+      return;
+    }
+    container.innerHTML = msgs.map(m => {
+      const isOwn = m.username === loggedInUser?.username;
+      if (editingId[chatId] === m.id) {
+        return `
+          <div class="msg-bubble" id="msg-${chatId}-${m.id}">
+            <div class="msg-editing">Editing Message — ${m.ts}</div>
+            <input class="msg-edit-input" id="edit-input-${chatId}-${m.id}" value="${escHtml(m.text)}">
+            <div class="msg-actions">
+              <button class="msg-btn save" onclick="saveEdit(${chatId},${m.id})">Save</button>
+              <button class="msg-btn cancel" onclick="cancelEdit(${chatId})">Cancel</button>
+            </div>
+          </div>`;
+      }
+      return `
+        <div class="msg-bubble" id="msg-${chatId}-${m.id}">
+          <div class="msg-header">
+            <span>${escHtml(m.username)} <span class="msg-meta">— ${m.ts}</span></span>
+          </div>
+          <div class="msg-text">${escHtml(m.text)}</div>
+          ${isOwn ? `
+          <div class="msg-actions">
+            <button class="msg-btn edit" onclick="startEdit(${chatId},${m.id})">Edit</button>
+            <button class="msg-btn del" onclick="deleteMsg(${chatId},${m.id})">Delete</button>
+          </div>` : ''}
+        </div>`;
+    }).join('');
+    scrollToBottom(chatId);
+  }
+
+  function scrollToBottom(chatId) {
+    const el = document.getElementById('messages-' + chatId);
+    if (el) setTimeout(() => { el.scrollTop = el.scrollHeight; }, 50);
+  }
+
+  /* ── SEND ── */
+  function updateSendBtn(chatId) {
+    const val = document.getElementById('input-' + chatId).value.trim();
+    document.getElementById('send-btn-' + chatId).disabled = !val;
+  }
+
+  function sendMessage(e, chatId) {
+    e.preventDefault();
+    const input = document.getElementById('input-' + chatId);
+    const text = input.value.trim();
+    if (!text) return;
+    const now = new Date();
+    const ts = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    messages[chatId].push({ id: nextMsgId[chatId]++, account_id: loggedInUser.username, username: loggedInUser.username, text, ts });
+    input.value = '';
+    document.getElementById('send-btn-' + chatId).disabled = true;
+    renderMessages(chatId);
+  }
+
+  /* ── EDIT / DELETE ── */
+  function startEdit(chatId, msgId) {
+    editingId[chatId] = msgId;
+    renderMessages(chatId);
+    const inp = document.getElementById(`edit-input-${chatId}-${msgId}`);
+    if (inp) { inp.focus(); inp.selectionStart = inp.value.length; }
+  }
+  function cancelEdit(chatId) { editingId[chatId] = null; renderMessages(chatId); }
+  function saveEdit(chatId, msgId) {
+    const inp = document.getElementById(`edit-input-${chatId}-${msgId}`);
+    if (!inp) return;
+    const newText = inp.value.trim();
+    if (!newText) return;
+    messages[chatId] = messages[chatId].map(m => m.id === msgId ? { ...m, text: newText } : m);
+    editingId[chatId] = null;
+    renderMessages(chatId);
+  }
+  function deleteMsg(chatId, msgId) {
+    messages[chatId] = messages[chatId].filter(m => m.id !== msgId);
+    renderMessages(chatId);
+  }
+
+  /* ── SETTINGS ── */
+  function showSettings(panel) {
+    activeChat = null;
+    document.querySelectorAll('.chat-link').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.chat-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.settings-link').forEach(l => l.classList.remove('active'));
+    document.getElementById('panel-' + panel).classList.add('active');
+    document.getElementById('link-' + panel).classList.add('active');
+    const urls = { 'update-account': 'localhost:5173/accounts/me', 'update-password': 'localhost:5173/accounts/me/password', 'manage-account': 'localhost:5173/accounts/manage' };
+    document.getElementById('url-bar').textContent = urls[panel] || 'localhost:5173/';
+  }
+
+  /* ── LOGOUT ── */
+  function handleLogout() {
+    loggedInUser = null;
+    messages = { 1: [...initMessages[1]], 2: [...initMessages[2]], 3: [...initMessages[3]] };
+    document.getElementById('login-username').value = '';
+    document.getElementById('login-password').value = '';
+    document.getElementById('login-btn').disabled = true;
+    showScreen('login');
+  }
+
+  /* ── TOAST ── */
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.transform = 'translateX(-50%) translateY(0)';
+    setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(80px)'; }, 2000);
+  }
+
+  /* ── HELPERS ── */
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* login on Enter */
+  document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+
+  /* ── RUN IT YOURSELF ── */
+  function toggleStep(header) {
+    const step = header.parentElement;
+    step.classList.toggle('open');
+  }
+
+  function copyCode(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      btn.style.color = '#C8F135';
+      setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 2000);
+    });
+  }
+</script>
+</body>
+</html>
