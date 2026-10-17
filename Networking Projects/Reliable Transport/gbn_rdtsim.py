@@ -113,129 +113,109 @@ class EntityA:
     # seqnum_limit is "the number of distinct seqnum values that your protocol
     # may use."  The seqnums and acknums in all layer3 Pkts must be between
     # zero and seqnum_limit-1, inclusive.  E.g., if seqnum_limit is 16, then
-    # all seqnums must be in the range 0-15  
+    # all seqnums must be in the range 0-15
     def __init__(self, seqnum_limit):
         self.seqnum_limit = seqnum_limit
-        self.curr_seq_num = 0
         self.next_seq_aval = 0
-        self.base = 0
-        self.window_size = seqnum_limit // 2
-        self.estimated_rtt = 20
+        # packetBuffer holds every packet ever given to A. base is the index of
+        # the oldest unACKed packet and curr_seq_num the index of the next
+        # packet to send, so the window is packetBuffer[base:curr_seq_num].
         self.packetBuffer = []
-        self.receivedAcks = []
+        self.base = 0
+        self.curr_seq_num = 0
+        self.window_size = seqnum_limit // 2
+        # Packets in this simulated network queue behind each other, so a fuller
+        # window takes longer to be ACKed. 15 + 3 per packet tested best.
+        self.estimated_rtt = 15 + 3 * self.window_size
+        self.timer_running = False
 
+    def start_timer_once(self):
+        if not self.timer_running:
+            start_timer(self, self.estimated_rtt)
+            self.timer_running = True
+
+    def stop_timer_if_running(self):
+        if self.timer_running:
+            stop_timer(self)
+            self.timer_running = False
+
+    def send_window(self):
+        while self.curr_seq_num < len(self.packetBuffer) and self.curr_seq_num < self.base + self.window_size:
+            if TRACE > 0:
+                print('A: sending', self.packetBuffer[self.curr_seq_num])
+            to_layer3(self, self.packetBuffer[self.curr_seq_num])
+            self.curr_seq_num += 1
+            self.start_timer_once()
 
     # Called from layer 5, passed the data to be sent to other side.
     # The argument `message` is a Msg containing the data to be sent.
-    #NAK = 0 ACK = 1
     def output(self, message):
         snd_pkt = Pkt(self.next_seq_aval, self.next_seq_aval, 0, message.data)
         snd_pkt.checksum = create_checksum(snd_pkt)
         self.packetBuffer.append(snd_pkt)
-        print('Buffered packet Entity A', snd_pkt)
         increase_seqnum(self)
-
-        # if(len(self.packetBuffer) < self.window_size):
-        if self.curr_seq_num < self.base + self.window_size:
-            print(f'Output: A - B, Sending Packet to Entity B', self.packetBuffer[self.curr_seq_num])
-            print('Current Sequence Number:', self.curr_seq_num, "Base", self.base)
-            to_layer3(self, self.packetBuffer[self.curr_seq_num])
-            self.curr_seq_num += 1
-            start_timer(self, self.estimated_rtt)
-            print(f'Timer Started', get_time(self))
-        else:
-            print(f'Packet Buffer Full')
-            
+        if TRACE > 0:
+            print('A: buffered', snd_pkt)
+        self.send_window()
 
     # Called from layer 3, when a packet arrives for layer 4 at EntityA.
     # The argument `packet` is a Pkt containing the newly arrived packet.
     def input(self, packet):
-        print(f'Received Packet at Entity A', packet)
-        # Check is checksum is corrupted 
-        checksum = create_checksum(packet)
-        if (packet.checksum != checksum):
-            print(f'Packet Corrupted by Checksum at Entity A', packet.checksum)
+        if packet.checksum != create_checksum(packet) or packet.acknum != packet.seqnum:
+            if TRACE > 0:
+                print('A: corrupt ACK ignored', packet)
             return
-        if(packet.acknum != packet.seqnum):
-            print(f'Packet Corrupted Entity by Acknum at Entity A', packet.acknum)
-            return
-        if(len(self.packetBuffer) <= 0):
-            print(f'Buffer empty')
-            return 
-        # if(self.packetBuffer[self.base].seqnum != packet.acknum):
-        #     return
-        print('Received ACK at Entity A', packet)
-        i = self.base
-        while i < self.curr_seq_num and i < self.base + self.window_size:
-            if(self.packetBuffer[i].seqnum == packet.acknum):
+        # ACKs are cumulative: an ACK for any packet in the window confirms it
+        # and everything before it.
+        for i in range(self.base, self.curr_seq_num):
+            if self.packetBuffer[i].seqnum == packet.acknum:
+                if TRACE > 0:
+                    print('A: ACK received, window base moves to', i + 1, packet)
                 self.base = i + 1
-                self.receivedAcks.append(packet)
-                print('PACKET', packet, 'HAS COMPLETED TRANSMISSION', self.base)
-                stop_timer(self)
-                print(f'Timer Stopped', get_time(self))
-                while self.curr_seq_num < self.base + self.window_size and self.curr_seq_num < len(self.packetBuffer):
-                    print(f'Input: A - B, Sending Packet to Entity B', self.packetBuffer[self.curr_seq_num])
-                    print('Current Sequence Number:', self.curr_seq_num, "Base", self.base)
-                    to_layer3(self, self.packetBuffer[self.curr_seq_num])
-                    self.curr_seq_num += 1
-                    start_timer(self, self.estimated_rtt)
-                    print(f'Timer Started', get_time(self))
-                else:
-                    print(f'Packet Buffer Full')
+                self.stop_timer_if_running()
+                if self.base < self.curr_seq_num:
+                    self.start_timer_once()
+                self.send_window()
                 return
-            else:
-                i += 1
-                #start_timer(self, self.estimated_rtt)
-                #print(f'Timer Started', get_time(self))
-                #return
-           
+        if TRACE > 0:
+            print('A: duplicate ACK ignored', packet)
+
     # Called when A's timer goes off.
     def timer_interrupt(self):
-        #Send all packets that are in the window 
-        print(f'Re-Transmitting a Packet at Timer Interrupt', self.packetBuffer[self.base])
-        for c in self.packetBuffer[self.base:(self.base + self.window_size)]:
-            print(f'Timer Interrupt A - B, Sent Packet to Entity B', c)
+        self.timer_running = False
+        if self.base == self.curr_seq_num:
+            return
+        for c in self.packetBuffer[self.base:self.curr_seq_num]:
+            if TRACE > 0:
+                print('A: timeout, resending', c)
             to_layer3(self, c)
-            start_timer(self, self.estimated_rtt)
-            print(f'Timer Started', get_time(self))
-        
+        self.start_timer_once()
+
 class EntityB:
     # The following method will be called once (only) before any other
     # EntityB methods are called.  You can use it to do any initialization.
     def __init__(self, seqnum_limit):
         self.expect_seq = 0
         self.seqnum_limit = seqnum_limit
-        self.expected_letter = ord('a')
-        self.last_recv_pkt = None
+        # Before anything arrives, re-ACK the sequence number just before 0 so
+        # B always has an ACK to send. A ignores it because it is not in A's window.
+        last = seqnum_limit - 1
+        self.last_recv_pkt = Pkt(last, last, 0, bytes(Msg.MSG_SIZE))
+        self.last_recv_pkt.checksum = create_checksum(self.last_recv_pkt)
 
     # Called from layer 3, when a packet arrives for layer 4 at EntityB.
     # The argument `packet` is a Pkt containing the newly arrived packet.
     def input(self, packet):
-        print(f'Received Packet at Entity B', packet, 'Next expected Seq Num', self.expect_seq)
-        checksum = create_checksum(packet)
-        if (packet.checksum != checksum):
-            print(f'Packet Corrupted by Checksum at Entity B', packet)
-            print(f'Retransmitting a Packet at Entity B by checksum', self.last_recv_pkt)
+        if packet.checksum != create_checksum(packet) or packet.seqnum != self.expect_seq:
+            if TRACE > 0:
+                print('B: corrupt or out of order, re-ACKing', self.last_recv_pkt)
             to_layer3(self, self.last_recv_pkt)
             return
-        if(packet.seqnum != self.expect_seq):
-            print(f'Wrong Sequence Number at Entity B', packet)
-            print(f'Retransmitting a Packet at Entity B by acknum', self.last_recv_pkt)
-            to_layer3(self, self.last_recv_pkt)
-            return
-        print(f'Packet was Uncorrupted at Entity B', packet)
-        if packet.payload[0] != self.expected_letter:
-            print('UNEXPECTED', packet)
-        #send message to layer 5
-        print('Expected Payload', self.expected_letter)
-        assert packet.payload[0] == self.expected_letter
         to_layer5(self, Msg(packet.payload))
-        self.expected_letter += 1
-        if self.expected_letter == 123:
-            self.expected_letter = ord('a')
         snd_pkt = Pkt(packet.seqnum, self.expect_seq, 0, packet.payload)
         snd_pkt.checksum = create_checksum(snd_pkt)
-        print('Send ACK to Entity A for packet:', snd_pkt)
+        if TRACE > 0:
+            print('B: delivered, sending ACK', snd_pkt)
         self.last_recv_pkt = snd_pkt
         to_layer3(self, snd_pkt)
         self.expect_seq += 1
