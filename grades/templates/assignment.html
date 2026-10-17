@@ -7,7 +7,7 @@
         <div class="hw-head">
             <div class="heading">{{ assignment.title }}</div>
             <div class="line"></div>
-            <p>Due {{ assignment.deadline | date:"F d" }}, total of {{ assignment.weight }} points</p>
+            <p>Due {{ assignment.deadline | date:"F d" }}, total of {{ assignment.points }} point{{ assignment.points|pluralize }}</p>
         </div>
     
         <div class="spacing"></div>
@@ -15,11 +15,11 @@
         {% if user_type == 'student' %}
         <div class="blue-bkgrd">
             <p>{{status}}</p>
-                {% if user_submission and overdue %}
+                {% if user_submission %}
                     <p>Current submission: <a href="{{ user_submission.file.url }}">{{ user_submission.file.name }}</a></p>
                 {% endif %}
                 {% if not overdue %}
-                    <form  action="{{ user_submission.file.url }}" method="post" enctype="multipart/form-data">
+                    <form class="submission-form" action="/{{ assignment.id }}/" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         <input type="file" name="submission_file" accept="application/pdf" required>
                         {% if error %}
@@ -34,14 +34,10 @@
 
         {% elif user_type == 'ta' or user_type == 'admin' %}
         <div class="blue-bkgrd">
-                <p>Currently {{ total_submissions }}/{{ total_students }} Submission{{ total_submissions|pluralize}}
-                <br><br>
-                {% if user_type == 'ta'%}
-                {{ subs_grader }} submission{{ subs_grader|pluralize }} assigned to you</p>
-                {% elif user_type == 'admmin' %}
-                Total Submissions: {{ total_submissions|pluralize}}
+                <p>Currently {{ total_submissions }}/{{ total_students }} submission{{ total_students|pluralize }}</p>
+                {% if user_type == 'ta' %}
+                <p>{{ subs_grader }} submission{{ subs_grader|pluralize }} assigned to you</p>
                 {% endif %}
-                </p>
                 <a class="profile" href="/{{ assignment.id }}/submissions">Grade</a>
         </div>
         {% endif %}

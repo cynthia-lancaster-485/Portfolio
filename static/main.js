@@ -1,177 +1,184 @@
 import { $ } from "/static/vendor/jquery.module.min.js";
-function say_hi(elt) {
-    console.log("Welcome to", elt.text());
+
+/* ---------- Sortable tables ---------- */
+
+// Clicking a sortable column header cycles: ascending -> descending -> original order
+function make_table_sortable($table) {
+    const $headers = $table.find("thead th.sort-column");
+
+    // Tell screen readers and keyboard users these headers are clickable
+    $headers.attr({ role: "button", tabindex: 0, "aria-sort": "none" });
+
+    $headers.on("click", function () {
+        sortByColumn($table, $(this));
+    });
+    $headers.on("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            sortByColumn($table, $(this));
+        }
+    });
 }
 
-say_hi($("h1"));
-let index = 0;
+function sortByColumn($table, $header) {
+    const index = $header.index();
+    const $tbody = $table.find("tbody");
+    const rows = $tbody.find("tr").toArray();
+    let state;
 
-function make_table_sortable($table){
-    const $lastHeaderCell = $($table.find("thead th").get(index));
-    const $headerCell = $($table.find("thead th"));
-    let $rows = $table.find('tbody tr');
-    let isAsc = $lastHeaderCell.hasClass('sort-asc');
-
-    $rows = $rows.toArray();
-    $lastHeaderCell.removeClass('sort-asc sort-desc').attr("aria-sort", "none");
-    $lastHeaderCell.attr("role", "button");
-
-    // Sort descending
-    if(isAsc){
-        $headerCell.removeClass('sort-asc').removeClass('sort-desc');
-        $lastHeaderCell.removeClass('sort-asc').addClass('sort-desc').attr("aria-sort", "descending");
-        sortRows($rows, false);
-    }
-    //Unsort
-    else if ($lastHeaderCell.hasClass('sort-desc')){
-        $headerCell.removeClass('sort-asc').removeClass('sort-desc');
-        $lastHeaderCell.removeClass('sort-desc').attr("aria-sort", "descending");;
-        $rows.sort((a, b) => $(a).index() - $(b).index()); 
-        $table.find('tbody').append($rows);
-    }
-    //sort ascending
-    else{
-        $headerCell.removeClass('sort-asc').removeClass('sort-desc');
-        $lastHeaderCell.removeClass('sort-desc').addClass('sort-asc');
-        sortRows($rows, index, true);
+    if ($header.hasClass("sort-asc")) {
+        state = "descending";
+    } else if ($header.hasClass("sort-desc")) {
+        state = "none";
+    } else {
+        state = "ascending";
     }
 
-    function sortRows($rows, ascending){
-        $rows.sort(function (a, b){
-            const $a = $(a).children().eq(index);
-            const $b = $(b).children().eq(index);
-            const scoreA = parseFloat($a.data('value'));
-            const scoreB = parseFloat($b.data('value'));
-            return ascending ? scoreA - scoreB : scoreB - scoreA;
-        });
-        $table.find('tbody').append($rows);
+    // Only one column is sorted at a time
+    $table.find("thead th.sort-column").removeClass("sort-asc sort-desc").attr("aria-sort", "none");
+
+    if (state === "none") {
+        // Restore the original order using each row's data-index
+        rows.sort((a, b) => $(a).data("index") - $(b).data("index"));
+    } else {
+        $header.addClass(state === "ascending" ? "sort-asc" : "sort-desc").attr("aria-sort", state);
+        const direction = state === "ascending" ? 1 : -1;
+        rows.sort((a, b) => direction * (cellValue(a, index) - cellValue(b, index)));
     }
 
+    $(rows).appendTo($tbody);
 }
 
-$('.sortable thead tr th').on('click', (e) => {
-    let $table = $(e.target).closest('table');
-    index = $(e.target).index();
-    make_table_sortable($table);
+// Numeric value of a cell, from data-value if present. Cells with no number sort last.
+function cellValue(row, index) {
+    const $cell = $(row).children().eq(index);
+    const raw = $cell.data("value");
+    const value = parseFloat(raw !== undefined && raw !== "" ? raw : $cell.text());
+    return Number.isNaN(value) ? -Infinity : value;
+}
 
+$("table.sortable").each(function () {
+    make_table_sortable($(this));
 });
 
-const $submissionForm = $(".submission-form");
-    if($submissionForm.length){
-        make_form_async($submissionForm);
-    }
+/* ---------- Asynchronous file upload ---------- */
 
-function make_form_async($form){
-    if(!$form || !$form.length){
-        console.log("There is no form");
-        return;
-    }
-    $form.on("submit", function (e){
+function make_form_async($form) {
+    $form.on("submit", function (e) {
         e.preventDefault();
-        let data = new FormData(this);
-        let url = $form.attr("action");
-        let enctype = $form.attr("enctype");
+        const data = new FormData(this);
+        const csrftoken = $form.find("input[name=csrfmiddlewaretoken]").val();
+        const $inputs = $form.find("input, button");
 
-        let $inputs = $form.find("input, button");
-        $inputs.prop("disabled", true);
+        $form.find("output.error-msg").remove();
 
         $.ajax({
-            url: url,
+            url: $form.attr("action"),
             type: "POST",
             data: data,
             processData: false,
             contentType: false,
-            mimeType: enctype,
-            headers: {
-                "X-CSRFToken": csrftoken
-            },
-            success: function(){
+            mimeType: $form.attr("enctype"),
+            headers: { "X-CSRFToken": csrftoken },
+            success: function () {
                 $form.replaceWith("<p>Upload succeeded</p>");
             },
-            error: function (xhr, status, error) {
-                console.error("The form didn't submit because of: ", error);
+            error: function (xhr) {
+                // The server re-renders the page with the error message; show that message here
+                const message = $(xhr.responseText).find("output.error-msg").text() || "Upload failed. Please try again.";
+                console.error("Upload failed:", message);
+                $form.prepend($("<output class='error-msg'>").text(message));
                 $inputs.prop("disabled", false);
-            }
-            
+            },
         });
+
+        // Disable after FormData is built, so the file is still included
+        $inputs.prop("disabled", true);
     });
 }
 
-make_grade_hypothesized($("#hypoTable"));
+const $submissionForm = $("form.submission-form");
+if ($submissionForm.length) {
+    make_form_async($submissionForm);
+}
 
-function make_grade_hypothesized($table){
-    let $hypoButton = $("<button>Hypothesize</button>");
-    $("#hypoTable").before($hypoButton);
+/* ---------- "What if" grade calculator ---------- */
 
-    $hypoButton.on('click', function(){
-        let isHypo = $table.hasClass('hypothesized');
+function make_grade_hypothesized($table) {
+    const $hypoButton = $("<button type='button'>Hypothesize</button>");
+    $table.before($hypoButton);
 
-        if(isHypo) {
-            $table.removeClass('hypothesized');
-            $hypoButton.text('Hypothesize');
+    $hypoButton.on("click", function () {
+        if ($table.hasClass("hypothesized")) {
+            $table.removeClass("hypothesized");
+            $hypoButton.text("Hypothesize");
             realGrades($table);
-        }
-        else {
+        } else {
             $table.addClass("hypothesized");
-            $hypoButton.text('Actual grades');
+            $hypoButton.text("Actual grades");
             hypoGrades($table);
         }
         calculateHypoGrade($table);
-
     });
-    
-    function hypoGrades($table){
-        let gradeData = $table.find('tbody tr td:last-child');
-        for(let i of gradeData){
-            let gradeText = $(i).text().trim();
-            if(gradeText === "Not Due" || gradeText === "Ungraded"){
-                let $input = $('<input type=\"number\" class=\"hypo-input\" placeholder=\"Enter grade\" data-score=\"'+gradeText+'\" data-weight=\"'+$(i).data('weight')+'\">');
-                $(i).replaceWith($input);
-                $input.on('keyup', function() {
-                    calculateHypoGrade($table);
-                })
-            }
-        };
-    }
+}
 
-    function realGrades($table){
-        let gradeData = $table.find('tbody tr input');
-        for(let i of gradeData){
-            $(i).replaceWith("<td data-weight=\""+$(i).data('weight')+"\">"+$(i).data('score')+"</td>");
-        }  
-    }
-
-    function calculateHypoGrade($table){
-        let totalPoints = 0;
-        let totalWeight = 0;
-
-        let gradeData = $table.find('tbody tr td:last-child');
-        for(let i of gradeData){
-            let weight = $(i).data('weight');
-            if($(i).text() != "Missing" && $(i).text() != "Ungraded" && $(i).text() != "Not Due"){
-                let weight = $(i).data('weight');
-                let tdScore = parseFloat($(i).text());
-
-                totalPoints += (tdScore * weight) / 100;
-                totalWeight += weight;
-            }
-            if($(i).text() == "Missing"){
-                totalWeight += weight;
-            }
+// Replace "Not Due" and "Ungraded" with number inputs, remembering the original text
+function hypoGrades($table) {
+    $table.find("tbody tr td:last-child").each(function () {
+        const $cell = $(this);
+        const text = $cell.text().trim();
+        if (text === "Not Due" || text === "Ungraded") {
+            $cell.data("original", text);
+            const $input = $("<input type='number' class='hypo-input' min='0' max='100' step='any' placeholder='%'>")
+                .attr("aria-label", "Hypothetical grade in percent");
+            $input.on("input keyup", () => calculateHypoGrade($table));
+            $cell.empty().append($input);
         }
-        let gradeDataInput = $table.find('tbody tr input');
-        for(let i of gradeDataInput){
-            if($(i).val()){
-                let weight = $(i).data('weight');
-                let tdScore = parseFloat($(i).val());
-    
-                totalPoints += (tdScore * weight) / 100;
-                totalWeight += weight;
-            } 
+    });
+}
 
+function realGrades($table) {
+    $table.find("tbody tr td:last-child").each(function () {
+        const $cell = $(this);
+        if ($cell.data("original")) {
+            $cell.text($cell.data("original"));
+            $cell.removeData("original");
+        }
+    });
+}
+
+// Same rules as the server: graded and missing count, ungraded and not due are ignored
+function calculateHypoGrade($table) {
+    let earned = 0;
+    let available = 0;
+
+    $table.find("tbody tr td:last-child").each(function () {
+        const $cell = $(this);
+        const weight = parseFloat($cell.data("weight"));
+        const $input = $cell.find("input");
+        const text = $cell.text().trim();
+        let percent = null;
+
+        if ($input.length) {
+            if ($input.val() !== "") percent = parseFloat($input.val());
+        } else if (text === "Missing") {
+            percent = 0;
+        } else if (text !== "Ungraded" && text !== "Not Due") {
+            // data-value holds the unrounded percentage, so this matches the server's math
+            percent = parseFloat($cell.data("value"));
         }
 
-        let finalGrade = ((totalPoints / totalWeight) * 100).toFixed(2);
-        $table.find('.final-grade').text(finalGrade + '%');
-    }
+        if (percent !== null && !Number.isNaN(percent)) {
+            earned += (percent / 100) * weight;
+            available += weight;
+        }
+    });
+
+    const finalGrade = available > 0 ? (earned / available) * 100 : 100;
+    $table.find(".final-grade").text(finalGrade.toFixed(2) + "%");
+}
+
+const $hypoTable = $("#hypoTable");
+if ($hypoTable.length) {
+    make_grade_hypothesized($hypoTable);
 }

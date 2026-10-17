@@ -17,8 +17,8 @@ class Submission(models.Model):
     score = models.FloatField(null=True, blank=True)
 
     def change_grade(self, user, new_grade):
-        #If not the ta raise an error
-        if self.grader != user:
+        #Only the assigned TA (or the admin) can change a grade
+        if not (self.grader == user or user.is_superuser):
             raise PermissionDenied
         #Update the grade
         self.score = new_grade

@@ -5,50 +5,57 @@
 {% include 'header.html' with title="Submissions" %}
 <div class="main-content">
     <div>
-        <div class="heading">Homework 1 (HTML)</div>
+        <div class="heading">{{ assignment.title }}</div>
         <div class="line"></div>
         <div>All grades out of {{ assignment.points }}</div>
     </div>
 
     <div class="spacing"></div>
 
-    {% if errors %}
-        {% for submission.id, errors in errors.items %}
-                <output class="error-msg">{{ errors.0 }}</output>
-        {% endfor %}
-    {% endif %}
+    <form action="/{{ assignment.id }}/submissions" method="post">
+        {% csrf_token %}
 
-    <table class="table-size sortable">
-        <thead>
-            <th style="width: 30%;">Student</th>
-            <th>Submission</th>
-            <th>Grade</th>
-        </thead>
-        <tbody>
-            <form action="/{{ assignment.id }}/submissions" method="post">
-            {% for submission in submissions %}
-                <tr data-index ="{{forloop.counter}}">
-                    <td>{{ submission.author.get_full_name }}</td>
-                    <td><a href="{{ submission.file.url }}">Submission</a></td>
-                    <td>
-                            <input type="number" id="grade" step="0.01" value="{{submission.score}}" name="grade-{{ submission.id }}" 
-                            class="{% if errors and submission.id in errors %}error-border{% endif %}" min="0" max="{{ assignment.points }}">
-                    </td>
-                    <td>
-                    
-                    </td>
+        {% for error in general_errors %}
+            <p><output class="error-msg">{{ error }}</output></p>
+        {% endfor %}
+
+        <table class="table-size sortable">
+            <thead>
+                <tr>
+                    <th style="width: 30%;">Student</th>
+                    <th>Submission</th>
+                    <th>Grade</th>
+                    <th></th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <div class="spacing"></div>
-    <div>
-            {% csrf_token %}
-            <input type="submit" value="Submit" style="font-size: 100%;" name="grade-{{ submission.id }}">
-            <a href="/{{ assignment.id }}">Back to assignment</a>
-    </div>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr data-index="{{ forloop.counter }}">
+                        <td>{{ row.submission.author.get_full_name }}</td>
+                        <td><a href="{{ row.submission.file.url }}">Submission</a></td>
+                        <td>
+                            <input type="number" step="any" min="0" max="{{ assignment.points }}"
+                                   name="grade-{{ row.submission.id }}"
+                                   aria-label="Grade for {{ row.submission.author.get_full_name }}"
+                                   value="{{ row.submission.score|default_if_none:'' }}"
+                                   class="{% if row.errors %}error-border{% endif %}">
+                        </td>
+                        <td>
+                            {% for error in row.errors %}
+                                <output class="error-msg">{{ error }}</output>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4">No submissions to grade yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="spacing"></div>
+        <div>
+            <button type="submit" style="font-size: 100%;">Submit</button>
+            <a href="/{{ assignment.id }}/">Back to assignment</a>
+        </div>
     </form>
     <div class="spacing"></div>
-    
 </div>
-

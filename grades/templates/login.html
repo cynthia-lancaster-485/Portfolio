@@ -14,13 +14,17 @@
 
     <form action="/profile/login/" method="post">
        {% csrf_token %}
+        {% if error %}
+        <output class="error-msg">{{ error }}</output>
+        <div class="spacing"></div>
+        {% endif %}
         <div class="login">
             <label for="username" class="login-left">Username:</label>
-            <input type="text" id="username" name="username" autofocus class="login-right"><br><br>
+            <input type="text" id="username" name="username" required autofocus class="login-right"><br><br>
         </div>
         <div class="login">
             <label for="password" class="login-left">Password:</label>
-            <input type="password" id="password" name="password" class="login-right"><br><br>
+            <input type="password" id="password" name="password" required class="login-right"><br><br>
         </div>
         <input type="hidden" name="next" value="{{ next }}">
         <div class="spacing"></div>

@@ -2,13 +2,12 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
 <link rel="stylesheet" href="/static/main.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 {% include 'header.html' with title="Profile" %}
 <div class="main-content">
     <div class="details">
         <div>
             <div class="heading">
-                Your grades
+                {% if user_type == "student" %}Your grades{% else %}Grading progress{% endif %}
             </div>
             <div class="line"></div>
         </div>
@@ -31,7 +30,7 @@
                         {% for data in assignment_data %}
                             <tr data-index="{{forloop.counter}}">
                                 <td>{{ data.assignment.title }}</td>
-                                <td>{{ data.graded_submissions }}/{{ data.submissions_assigned}} </td>
+                                <td data-value="{{ data.graded_submissions }}">{{ data.graded_submissions }}/{{ data.submissions_assigned }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -47,7 +46,7 @@
                         {% for data in assignment_data %}
                             <tr data-index="{{forloop.counter}}">
                                 <td><a href="/{{ data.assignment.id }}">{{ data.assignment.title }}</a></td>
-                                <td data-weight="{{data.assignment.weight}}" data-value="{{ data.score }}">{{ data.score }}</td>
+                                <td data-weight="{{ data.assignment.weight }}" data-value="{{ data.sort_value }}">{{ data.score }}</td>
                             </tr>
                         {% endfor %}    
                     </tbody>
