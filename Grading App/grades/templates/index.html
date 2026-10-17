@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<link rel="stylesheet" href="/static/main.css">
+{% include 'header.html' with title="Index" %}
+<div class="main-content">
+    <div class="assignments">
+        <div>
+            <div class="heading">All Assignments</div>
+            <div class="line"></div>
+        </div>
+    
+        <div class="spacing"></div>
+    
+        <table class="table-size sortable">
+            <thead>
+                <th style="width: 70%;">Assignment</th>
+                <th style="width: 20%;" class="sort-column">Due date</th>
+                <th style="width: 10%;" class="sort-column">Weight</th>
+            </thead>
+            <tbody>
+                {% for assignment in assignments %}
+                    <tr data-index="{{forloop.counter}}">
+                        <td><a href="/{{ assignment.id }}">{{ assignment.title }}</a></td>
+                        <td data-value="{{assignment.deadline | date:"U"}}">{{ assignment.deadline | date:"M d" }}</td>
+                        <td data-value="{{ assignment.weight }}">{{ assignment.weight }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="spacing"></div>
+    </div>
+</div>
+

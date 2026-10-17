@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<link rel="stylesheet" href="/static/main.css">
+{% include 'header.html' with title="Submissions" %}
+<div class="main-content">
+    <div>
+        <div class="heading">{{ assignment.title }}</div>
+        <div class="line"></div>
+        <div>All grades out of {{ assignment.points }}</div>
+    </div>
+
+    <div class="spacing"></div>
+
+    <form action="/{{ assignment.id }}/submissions" method="post">
+        {% csrf_token %}
+
+        {% for error in general_errors %}
+            <p><output class="error-msg">{{ error }}</output></p>
+        {% endfor %}
+
+        <table class="table-size sortable">
+            <thead>
+                <tr>
+                    <th style="width: 30%;">Student</th>
+                    <th>Submission</th>
+                    <th>Grade</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr data-index="{{ forloop.counter }}">
+                        <td>{{ row.submission.author.get_full_name }}</td>
+                        <td><a href="{{ row.submission.file.url }}">Submission</a></td>
+                        <td>
+                            <input type="number" step="any" min="0" max="{{ assignment.points }}"
+                                   name="grade-{{ row.submission.id }}"
+                                   aria-label="Grade for {{ row.submission.author.get_full_name }}"
+                                   value="{{ row.value }}"
+                                   class="{% if row.errors %}error-border{% endif %}">
+                        </td>
+                        <td>
+                            {% for error in row.errors %}
+                                <output class="error-msg">{{ error }}</output>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4">No submissions to grade yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="spacing"></div>
+        <div>
+            <button type="submit" style="font-size: 100%;">Submit</button>
+            <a href="/{{ assignment.id }}/">Back to assignment</a>
+        </div>
+    </form>
+    <div class="spacing"></div>
+</div>

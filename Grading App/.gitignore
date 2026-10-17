@@ -1,0 +1,17 @@
+# Local data
+db.sqlite3
+uploads/
+staticfiles/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Editors and OS
+.DS_Store
+.vscode/
+.idea/
+*~
