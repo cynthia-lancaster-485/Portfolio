@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Course Gradebook — Cynthia Lancaster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --lime: #C8F135; --lime-dark: #9DC418;
+      --ink: #1A1A18; --paper: #F5F2EB;
+      --muted: #7A7A72; --border: rgba(26,26,24,0.12); --radius: 20px;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); line-height: 1.6; overflow-x: hidden; }
+
+    nav.site-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 3rem; border-bottom: 1px solid var(--border); background: var(--paper); position: sticky; top: 0; z-index: 200; }
+    .nav-logo { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; text-decoration: none; color: var(--ink); }
+    .nav-back { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--muted); font-size: 0.85rem; }
+    .nav-back:hover { color: var(--ink); }
+
+    .case-hero { padding: 5rem 3rem 4rem; max-width: 1100px; margin: 0 auto; }
+    .eyebrow { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow::before { content: ''; width: 32px; height: 2px; background: var(--lime-dark); display: inline-block; }
+    .case-title { font-family: 'Fraunces', serif; font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 1.5rem; }
+    .case-title em { font-style: italic; color: var(--lime-dark); }
+    .case-sub { font-size: 1.1rem; color: var(--muted); max-width: 640px; line-height: 1.7; margin-bottom: 3rem; }
+    .case-meta { display: flex; gap: 3rem; flex-wrap: wrap; }
+    .meta-item label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.25rem; }
+    .meta-item span { font-size: 0.95rem; font-weight: 500; }
+
+    .case-section { padding: 5rem 3rem; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section-heading { font-family: 'Fraunces', serif; font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .prose { color: var(--muted); font-size: 1rem; line-height: 1.8; max-width: 680px; }
+    .prose + .prose { margin-top: 1rem; }
+    .full-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+    .stack-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-top: 2.5rem; }
+    .stack-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center; }
+    .stack-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .stack-layer { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.25rem; }
+    .stack-name { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.35rem; }
+    .stack-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+    .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 2.5rem; }
+    .feature-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; }
+    .feature-tag { display: inline-block; background: #E8F5C8; color: #4A6B10; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.2rem 0.65rem; border-radius: 100px; margin-bottom: 0.75rem; }
+    .feature-card h4 { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .feature-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+
+    /* security list */
+    .security-list { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 2.5rem; }
+    .security-item { display: flex; gap: 1rem; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
+    .security-icon { width: 36px; height: 36px; flex-shrink: 0; border-radius: 50%; background: var(--lime); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+    .security-item h4 { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .security-item p { font-size: 0.84rem; color: var(--muted); line-height: 1.6; }
+
+    /* before / after */
+    .fix-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2.5rem; }
+    .fix-stat { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
+    .fix-num { font-family: 'Fraunces', serif; font-size: 2.4rem; font-weight: 700; line-height: 1; margin-bottom: 0.4rem; }
+    .fix-label { font-size: 0.84rem; color: var(--muted); line-height: 1.5; }
+    .fix-list { margin-top: 2rem; max-width: 760px; list-style: none; }
+    .fix-list li { display: flex; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.92rem; color: var(--muted); }
+    .fix-list li:last-child { border: none; }
+    .fix-list strong { color: var(--ink); font-weight: 500; }
+    .fix-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lime-dark); flex-shrink: 0; margin-top: 0.55rem; }
+
+    /* demo wrapper */
+    .demo-outer { padding: 0 3rem 5rem; max-width: 1100px; margin: 0 auto; }
+    .demo-tip { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 0.85rem 1.25rem; font-size: 0.85rem; color: #1d4ed8; margin-bottom: 1.5rem; }
+    .demo-tip code { background: #dbeafe; padding: 1px 6px; border-radius: 4px; }
+    .role-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.6rem; }
+    .role-chip { border: 1px solid #93c5fd; background: #fff; color: #1d4ed8; border-radius: 100px; padding: 0.3rem 0.9rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; font-family: inherit; }
+    .role-chip:hover, .role-chip:focus-visible { background: #1d4ed8; color: #fff; outline: none; }
+
+    .app-shell { border-radius: 16px; overflow: hidden; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 24px 80px rgba(0,0,0,0.12); background: #fff; }
+    .app-chrome { background: #f3f4f6; padding: 0.6rem 1rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid #e5e7eb; }
+    .chrome-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .chrome-dot.r { background: #FF5F57; } .chrome-dot.y { background: #FFBD2E; } .chrome-dot.g { background: #28C840; }
+    .chrome-url { background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.2rem 0.9rem; font-size: 0.72rem; color: #6b7280; margin: 0 auto; font-family: monospace; min-width: 280px; text-align: center; }
+
+    /* ── The grading app itself (mirrors the real app's CSS) ── */
+    .gapp { font-family: 'IBM Plex Sans', sans-serif; line-height: 1.25; color: #000; min-height: 560px; max-height: 640px; overflow-y: auto; }
+    .gapp * { font-family: 'IBM Plex Sans', sans-serif; }
+    .gapp-nav { background: #ddd; box-shadow: 0 0 5px gray; }
+    .gapp-nav-inner { display: flex; align-items: center; gap: 1rem; padding: 0.6rem 1rem 0.8rem; max-width: 50rem; margin: 0 auto; font-size: 1.15rem; }
+    .gapp-nav a { color: #444; text-decoration: none; cursor: pointer; }
+    .gapp-nav a:hover, .gapp-nav a:focus-visible { text-decoration: underline; outline: none; }
+    .gapp-nav .gapp-who { margin-left: auto; font-size: 0.8rem; color: #555; }
+    .gapp-main { max-width: 50rem; margin: 0 auto; padding: 0 2rem 2rem; }
+    .gapp-heading { font-size: 1.6rem; font-weight: 700; margin: 2rem 0 0; }
+    .gapp-line { height: 1px; background: #ddd; margin: 0.25rem 0 0; }
+    .gapp-spacing { height: 1rem; }
+    .gapp-card { padding: 1rem; background: #b1c3de; border: 3px solid #204a87; }
+    .gapp-card p { margin: 0 0 0.75rem; }
+    .gapp-card p:last-child { margin-bottom: 0; }
+    .gapp a.gapp-link { color: #0000ee; text-decoration: underline; cursor: pointer; }
+    .gapp table { width: 100%; border-collapse: collapse; line-height: 1.6; }
+    .gapp th { text-align: left; font-weight: 700; }
+    .gapp td.num, .gapp th.num { text-align: right; }
+    .gapp th.sort-column { cursor: pointer; user-select: none; }
+    .gapp th.sort-column:focus-visible { outline: 2px solid #204a87; outline-offset: 2px; }
+    .gapp th.sort-asc::after { content: " \25b2"; }
+    .gapp th.sort-desc::after { content: " \25bc"; }
+    .gapp output.error-msg { color: red; font-weight: 700; display: block; }
+    .gapp input.error-border { border: 2px solid red; }
+    .gapp input[type=number] { width: 7rem; padding: 2px 4px; font-size: 0.95rem; }
+    .gapp button { font-size: 0.95rem; padding: 2px 10px; cursor: pointer; }
+    .gapp .login-row { display: flex; align-items: center; margin-bottom: 1rem; }
+    .gapp .login-row label { flex: 1; }
+    .gapp .login-row input { flex: 1; padding: 3px 6px; font-size: 1rem; }
+    .gapp .login-btn { width: 100%; max-width: 400px; font-size: 1.15rem; padding: 4px; display: block; margin: 1.5rem auto 0; }
+    .gapp .forbidden { text-align: center; padding: 4rem 1rem; }
+    .gapp .forbidden h2 { font-size: 2rem; margin-bottom: 0.5rem; }
+    .gapp .desc p { margin: 0.5rem 0; }
+
+    /* crafted request panel */
+    .devtools { margin-top: 1.25rem; background: #0F1117; color: #e2e8f0; border-radius: 14px; padding: 1.25rem 1.5rem; display: none; }
+    .devtools.show { display: block; }
+    .devtools h5 { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--lime); margin-bottom: 0.5rem; }
+    .devtools p { font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 0.75rem; }
+    .devtools pre { background: #1a1d27; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.78rem; font-family: 'SF Mono', 'Fira Code', monospace; overflow-x: auto; white-space: pre-wrap; }
+    .devtools button { margin-top: 0.75rem; background: var(--lime); color: var(--ink); border: none; border-radius: 100px; padding: 0.45rem 1.1rem; font-weight: 600; font-size: 0.82rem; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .devtools .result { margin-top: 0.75rem; font-size: 0.85rem; }
+    .devtools .result .bad { color: #fca5a5; }
+    .devtools .result .ok { color: var(--lime); }
+
+    /* run it yourself */
+    .run-section { background: #0F1117; padding: 5rem 3rem; }
+    .run-inner { max-width: 1100px; margin: 0 auto; }
+    .run-section .section-label { color: rgba(255,255,255,0.35); }
+    .run-section .section-label::after { background: rgba(255,255,255,0.08); }
+    .run-section .section-heading { color: #fff; margin-bottom: 0.75rem; }
+    .run-section .prose { color: rgba(255,255,255,0.45); margin-bottom: 2.5rem; }
+    .run-steps { display: flex; flex-direction: column; }
+    .run-step { border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; margin-bottom: 1rem; }
+    .run-step-header { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 1.5rem; background: rgba(255,255,255,0.04); cursor: pointer; user-select: none; transition: background 0.15s; width: 100%; border: none; text-align: left; font-family: inherit; }
+    .run-step-header:hover { background: rgba(255,255,255,0.07); }
+    .run-step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--lime); color: var(--ink); font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .run-step-title { font-size: 0.95rem; font-weight: 600; color: #fff; flex: 1; }
+    .run-step-chevron { color: rgba(255,255,255,0.3); font-size: 0.75rem; transition: transform 0.2s; }
+    .run-step.open .run-step-chevron { transform: rotate(180deg); }
+    .run-step-body { display: none; padding: 1.25rem 1.5rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.06); }
+    .run-step.open .run-step-body { display: block; }
+    .run-step-desc { font-size: 0.85rem; color: rgba(255,255,255,0.45); line-height: 1.7; margin-bottom: 1.1rem; }
+    .run-step-desc a { color: var(--lime); text-decoration: none; }
+    .run-step-desc a:hover { text-decoration: underline; }
+    .run-step-desc code, .run-note code { background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 3px; }
+    .code-block { background: #1a1d27; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; margin-top: 0.75rem; }
+    .code-block-header { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 1rem; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .code-block-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+    .code-copy-btn { font-size: 0.68rem; background: transparent; border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); border-radius: 4px; padding: 2px 8px; cursor: pointer; transition: all 0.15s; }
+    .code-copy-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .code-block pre { padding: 1rem 1.25rem; font-size: 0.82rem; font-family: 'SF Mono', 'Fira Code', monospace; color: #e2e8f0; overflow-x: auto; line-height: 1.7; }
+    .code-block pre .comment { color: #6b7686; }
+    .code-block pre .cmd { color: var(--lime); }
+    .code-block pre .str { color: #68d391; }
+    .run-note { display: flex; align-items: flex-start; gap: 0.6rem; background: rgba(200,241,53,0.07); border: 1px solid rgba(200,241,53,0.2); border-radius: 8px; padding: 0.75rem 1rem; margin-top: 1rem; }
+    .run-note p { font-size: 0.8rem; color: rgba(255,255,255,0.5); line-height: 1.6; }
+    .run-note span { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .github-cta { display: inline-flex; align-items: center; gap: 0.6rem; background: #fff; color: var(--ink); padding: 0.75rem 1.5rem; border-radius: 100px; text-decoration: none; font-weight: 600; font-size: 0.88rem; transition: transform 0.2s, box-shadow 0.2s; }
+    .github-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+
+    .takeaway-section { background: var(--ink); color: #fff; padding: 5rem 3rem; }
+    .takeaway-inner { max-width: 1100px; margin: 0 auto; }
+    .takeaway-section .section-label { color: rgba(255,255,255,0.4); }
+    .takeaway-section .section-label::after { background: rgba(255,255,255,0.1); }
+    .takeaway-section .section-heading { color: #fff; }
+    .takeaway-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2.5rem; }
+    .takeaway-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius); padding: 1.75rem; }
+    .takeaway-num { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 700; color: var(--lime); margin-bottom: 0.75rem; }
+    .takeaway-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .takeaway-card p { font-size: 0.83rem; color: rgba(255,255,255,0.5); line-height: 1.65; }
+
+    .back-section { padding: 3rem; text-align: center; }
+    .back-link { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--muted); font-size: 0.9rem; }
+    .back-link:hover { color: var(--ink); }
+
+    @media (max-width: 900px) {
+      nav.site-nav { padding: 1rem 1.5rem; }
+      .case-hero, .case-section { padding: 3rem 1.5rem; }
+      .demo-outer { padding: 0 1rem 3rem; }
+      .stack-grid { grid-template-columns: 1fr 1fr; }
+      .features-grid, .security-list, .fix-grid, .takeaway-grid { grid-template-columns: 1fr; }
+      .takeaway-section, .run-section { padding: 3rem 1.5rem; }
+      .gapp-main { padding: 0 1rem 1.5rem; }
+      .chrome-url { min-width: 0; }
+      .gapp input[type=number] { width: 5rem; }
+      .gapp-nav .gapp-who { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">Cynthia Lancaster.</a>
+  <a href="index.html#work" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+    Back to portfolio
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="case-hero">
+  <p class="eyebrow">Case Study · Full Stack Web Application</p>
+  <h1 class="case-title">A gradebook built <br><em>secure by design.</em></h1>
+  <p class="case-sub">Over a semester at the University of Utah, I built a complete grading system in Django: three kinds of users, PDF uploads, weighted grades, and a deployment to AWS with my own domain and HTTPS. Later I came back to it, found the bugs a class autograder never checked, fixed them, and added automated tests.</p>
+  <div class="case-meta">
+    <div class="meta-item"><label>Role</label><span>Solo Developer</span></div>
+    <div class="meta-item"><label>Backend</label><span>Python / Django</span></div>
+    <div class="meta-item"><label>Frontend</label><span>Django templates + JavaScript</span></div>
+    <div class="meta-item"><label>Database</label><span>SQLite (Django ORM)</span></div>
+    <div class="meta-item"><label>Deployment</label><span>AWS EC2 · NGINX · HTTPS</span></div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- STACK -->
+<div class="case-section">
+  <p class="section-label">The stack</p>
+  <h2 class="section-heading">One framework, every layer.</h2>
+  <p class="prose">Django handled the database, the pages, and authentication, which let me focus on the rules that make a gradebook trustworthy: who can see what, who can change what, and what counts toward a grade.</p>
+  <div class="stack-grid">
+    <div class="stack-card">
+      <div class="stack-icon">🐍</div>
+      <div class="stack-layer">Backend</div>
+      <div class="stack-name">Python / Django</div>
+      <p class="stack-desc">Models, views, and validation, with every permission rule kept in one place on the model.</p>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🖥️</div>
+      <div class="stack-layer">Frontend</div>
+      <div class="stack-name">Templates + JavaScript</div>
+      <p class="stack-desc">Server rendered pages, plus JavaScript for sorting, async uploads, and a live grade calculator.</p>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🗄️</div>
+      <div class="stack-layer">Database</div>
+      <div class="stack-name">Django ORM</div>
+      <p class="stack-desc">Efficient queries, like picking the least busy TA in a single query instead of a loop.</p>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">☁️</div>
+      <div class="stack-layer">Deployment</div>
+      <div class="stack-name">AWS EC2</div>
+      <p class="stack-desc">Ubuntu server, NGINX reverse proxy, a custom domain, and HTTPS through Let's Encrypt.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- FEATURES -->
+<div class="case-section">
+  <p class="section-label">What it does</p>
+  <h2 class="section-heading">Three roles, one gradebook.</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="feature-tag">Students</span>
+      <h4>Upload, track, and plan</h4>
+      <p>Upload a PDF before the deadline, see every grade, and use the "what if" calculator to see what a score on upcoming work would do to the final grade.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-tag">TAs</span>
+      <h4>Grade only what's yours</h4>
+      <p>Each new submission goes automatically to the TA with the fewest for that assignment, and each TA sees and grades only their own queue.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-tag">Instructor</span>
+      <h4>See everything</h4>
+      <p>The instructor sees every submission, can grade any of them, and tracks overall grading progress.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-tag">Accessibility</span>
+      <h4>Sortable tables for everyone</h4>
+      <p>Column headers sort by mouse or keyboard and announce their sort state to screen readers with aria-sort.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- INTERACTIVE DEMO -->
+<div class="case-section" style="padding-bottom: 2rem;">
+  <p class="section-label">Interactive demo</p>
+  <h2 class="section-heading">Try it as a student, a TA, or the instructor.</h2>
+  <p class="prose">This is a faithful simulation of the real Django app: same pages, same rules, same validation, running in your browser with sample data. Sort the tables, upload a file, try the what if calculator, or log in as a TA and try to break the grading form.</p>
+</div>
+
+<div class="demo-outer">
+  <div class="demo-tip">
+    💡 <strong>Sample accounts</strong> (each password matches the username): student <code>a</code>, TA <code>g</code>, instructor <code>pavpan</code>. Or jump straight in:
+    <div class="role-chips">
+      <button type="button" class="role-chip" data-login="a">Log in as Alice (student)</button>
+      <button type="button" class="role-chip" data-login="g">Log in as Garry (TA)</button>
+      <button type="button" class="role-chip" data-login="pavpan">Log in as the instructor</button>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <div class="app-chrome" aria-hidden="true">
+      <div class="chrome-dot r"></div>
+      <div class="chrome-dot y"></div>
+      <div class="chrome-dot g"></div>
+      <div class="chrome-url" id="url-bar">localhost:8000/profile/login/</div>
+    </div>
+    <div class="gapp" id="gapp" aria-live="polite"></div>
+  </div>
+
+  <div class="devtools" id="devtools" aria-live="polite">
+    <h5>Try a crafted request</h5>
+    <p>The grading form only shows Garry his own students, but anyone can edit a form in developer tools or send their own request. This sends a grade for Ben's Homework 1, which is assigned to Helen, not Garry.</p>
+    <pre id="crafted-request"></pre>
+    <button type="button" id="crafted-send">Send this request</button>
+    <div class="result" id="crafted-result"></div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- SECURITY -->
+<div class="case-section">
+  <p class="section-label">Security</p>
+  <h2 class="section-heading">Never trust the browser.</h2>
+  <p class="prose">The hardest part of this project wasn't the features. It was making sure nobody could do what they shouldn't. Every limit in the page is repeated on the server, because anyone can edit a form or send their own request.</p>
+  <div class="security-list">
+    <div class="security-item">
+      <div class="security-icon">🔒</div>
+      <div>
+        <h4>One source of truth</h4>
+        <p>Permission checks live in model methods, so the grading page, the form handler, and the file download all enforce the exact same rule.</p>
+      </div>
+    </div>
+    <div class="security-item">
+      <div class="security-icon">🛡️</div>
+      <div>
+        <h4>Crafted requests fail</h4>
+        <p>A TA who edits the form to grade a submission that isn't theirs gets an error, not a changed grade. Students get a 403 on the grading page.</p>
+      </div>
+    </div>
+    <div class="security-item">
+      <div class="security-icon">📄</div>
+      <div>
+        <h4>Uploads are checked twice</h4>
+        <p>A file must end in .pdf and start with the real PDF signature. The 64 MiB limit is checked before reading the file, and files are checked again on download.</p>
+      </div>
+    </div>
+    <div class="security-item">
+      <div class="security-icon">↩️</div>
+      <div>
+        <h4>No open redirects</h4>
+        <p>After login, the app only follows a "next" link back to its own site, so a phishing link can't bounce users somewhere else.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- REVISITED -->
+<div class="case-section">
+  <p class="section-label">Revisiting my own code</p>
+  <h2 class="section-heading">Coming back with fresh eyes.</h2>
+  <p class="prose">When I moved this project from my school account to my own, I ran it end to end instead of trusting that it passed the class autograder. I found real bugs, fixed each one in its own commit, and wrote tests so they stay fixed. The first commit in the repo is the code exactly as I submitted it, so the before and after are both there to see.</p>
+  <div class="fix-grid">
+    <div class="fix-stat"><div class="fix-num">21</div><p class="fix-label">automated tests covering login, uploads, permissions, grading, and grade math</p></div>
+    <div class="fix-stat"><div class="fix-num">15</div><p class="fix-label">of those tests fail on the original code, so they catch real bugs</p></div>
+    <div class="fix-stat"><div class="fix-num">CI</div><p class="fix-label">GitHub Actions runs the tests whenever the app changes</p></div>
+  </div>
+  <ul class="fix-list">
+    <li><span class="fix-dot"></span><span><strong>Saving grades crashed</strong> because a helper function had a page decorator on it.</span></li>
+    <li><span class="fix-dot"></span><span><strong>Uploads crashed</strong> because of an incorrect filter in the TA assignment query.</span></li>
+    <li><span class="fix-dot"></span><span><strong>Failed upload checks still saved the file.</strong> The error showed, but the save happened anyway.</span></li>
+    <li><span class="fix-dot"></span><span><strong>Percentages used the wrong field</strong> (weight instead of points), which hid the bug whenever the two matched.</span></li>
+    <li><span class="fix-dot"></span><span><strong>JavaScript fixes:</strong> an undefined CSRF token, restoring the original sort order, and the calculator replacing table cells instead of their contents.</span></li>
+  </ul>
+</div>
+
+<hr class="full-divider">
+
+<!-- RUN IT YOURSELF -->
+<div class="run-section">
+  <div class="run-inner">
+    <p class="section-label">Run it yourself</p>
+    <h2 class="section-heading">Want to run the real app locally?</h2>
+    <p class="prose">The complete source code, tests, and sample data are on GitHub in the Grading App folder. It takes about five minutes and only needs Python.</p>
+
+    <a class="github-cta" href="https://github.com/cynthia-lancaster-485/Portfolio/tree/main/Grading%20App" target="_blank" rel="noopener">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      View on GitHub ↗
+    </a>
+
+    <div class="run-steps" style="margin-top: 2.5rem;">
+      <div class="run-step open">
+        <button type="button" class="run-step-header" aria-expanded="true">
+          <span class="run-step-num">1</span>
+          <span class="run-step-title">Prerequisites</span>
+          <span class="run-step-chevron">▼</span>
+        </button>
+        <div class="run-step-body">
+          <p class="run-step-desc">You only need <a href="https://python.org" target="_blank" rel="noopener">Python 3.11 or newer ↗</a>. To check, run <code>python3 --version</code> in your terminal.</p>
+        </div>
+      </div>
+
+      <div class="run-step">
+        <button type="button" class="run-step-header" aria-expanded="false">
+          <span class="run-step-num">2</span>
+          <span class="run-step-title">Clone the repository</span>
+          <span class="run-step-chevron">▼</span>
+        </button>
+        <div class="run-step-body">
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-block-label">Terminal</span>
+              <button type="button" class="code-copy-btn" data-copy="git clone https://github.com/cynthia-lancaster-485/Portfolio.git&#10;cd &quot;Portfolio/Grading App&quot;">Copy</button>
+            </div>
+            <pre><span class="comment"># Clone the repo</span>
+<span class="cmd">git clone</span> <span class="str">https://github.com/cynthia-lancaster-485/Portfolio.git</span>
+
+<span class="comment"># Move into the Grading App folder</span>
+<span class="cmd">cd</span> <span class="str">"Portfolio/Grading App"</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="run-step">
+        <button type="button" class="run-step-header" aria-expanded="false">
+          <span class="run-step-num">3</span>
+          <span class="run-step-title">Install Django and load sample data</span>
+          <span class="run-step-chevron">▼</span>
+        </button>
+        <div class="run-step-body">
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-block-label">Terminal</span>
+              <button type="button" class="code-copy-btn" data-copy="python3 -m venv .venv&#10;source .venv/bin/activate&#10;pip install -r requirements.txt&#10;python3 manage.py migrate&#10;python3 makedata.py">Copy</button>
+            </div>
+            <pre><span class="comment"># Create and turn on a virtual environment</span>
+<span class="cmd">python3 -m venv</span> .venv
+<span class="cmd">source</span> .venv/bin/activate   <span class="comment"># Windows: .venv\Scripts\activate</span>
+
+<span class="comment"># Install Django, create the database, add sample users and assignments</span>
+<span class="cmd">pip install</span> -r requirements.txt
+<span class="cmd">python3 manage.py</span> migrate
+<span class="cmd">python3</span> makedata.py</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="run-step">
+        <button type="button" class="run-step-header" aria-expanded="false">
+          <span class="run-step-num">4</span>
+          <span class="run-step-title">Start the server and log in</span>
+          <span class="run-step-chevron">▼</span>
+        </button>
+        <div class="run-step-body">
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-block-label">Terminal</span>
+              <button type="button" class="code-copy-btn" data-copy="python3 manage.py runserver">Copy</button>
+            </div>
+            <pre><span class="cmd">python3 manage.py</span> runserver</pre>
+          </div>
+          <div class="run-note">
+            <span>🚀</span>
+            <p>Open <code>http://localhost:8000</code> and log in as <code>a</code> (student), <code>g</code> (TA), or <code>pavpan</code> (instructor). Each password matches the username.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="run-step">
+        <button type="button" class="run-step-header" aria-expanded="false">
+          <span class="run-step-num">5</span>
+          <span class="run-step-title">Run the tests</span>
+          <span class="run-step-chevron">▼</span>
+        </button>
+        <div class="run-step-body">
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-block-label">Terminal</span>
+              <button type="button" class="code-copy-btn" data-copy="python3 manage.py test grades">Copy</button>
+            </div>
+            <pre><span class="cmd">python3 manage.py</span> test grades</pre>
+          </div>
+          <div class="run-note">
+            <span>🧪</span>
+            <p>All 21 tests should pass, covering login and redirects, upload checks, file permissions, grading rules, and the weighted grade math.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAKEAWAYS -->
+<div class="takeaway-section">
+  <div class="takeaway-inner">
+    <p class="section-label">What I learned</p>
+    <h2 class="section-heading">Security is a design decision.</h2>
+    <div class="takeaway-grid">
+      <div class="takeaway-card">
+        <div class="takeaway-num">01</div>
+        <h4>Where a rule lives matters</h4>
+        <p>Putting permission checks on the model meant one rule protected every page that used it, instead of hoping each page remembered to check.</p>
+      </div>
+      <div class="takeaway-card">
+        <div class="takeaway-num">02</div>
+        <h4>The server is the last line of defense</h4>
+        <p>Limits in the HTML make a form friendlier, but only checks on the server make it safe. Good UX and good security turned out to be the same work.</p>
+      </div>
+      <div class="takeaway-card">
+        <div class="takeaway-num">03</div>
+        <h4>Tests find what you missed</h4>
+        <p>Writing tests later surfaced bugs I had shipped without noticing. Now I check my work by trying to break it, not just by watching it work.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="back-section">
+  <a href="index.html#work" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+    Back to all projects
+  </a>
+</div>
+
+<script>
+(function () {
+  /* ── SAMPLE DATA (mirrors the real app's makedata.py) ── */
+  const DAY = 24 * 60 * 60 * 1000;
+  const today = new Date();
+  const due = (days) => new Date(today.getTime() + days * DAY);
+
+  const users = {
+    pavpan: { name: "Prof. Panchekha", role: "admin" },
+    g: { name: "Garry Grader", role: "ta" },
+    h: { name: "Helen Helper", role: "ta" },
+    a: { name: "Alice Algorithmer", role: "student" },
+    b: { name: "Ben Bitdiddle", role: "student" },
+    c: { name: "Cody Coder", role: "student" },
+    d: { name: "Debby Debugger", role: "student" },
+  };
+  const students = ["a", "b", "c", "d"];
+
+  const assignments = [
+    { id: 1, title: "Github username", due: due(-90), weight: 1, points: 1, desc: "Tell us your GitHub username so we can create your assignment repository." },
+    { id: 2, title: "Homework 1 (HTML)", due: due(-76), weight: 100, points: 100, desc: "Write the HTML for the five pages of the grading app: assignments, assignment, submissions, profile, and login." },
+    { id: 3, title: "Homework 2 (CSS)", due: due(-62), weight: 100, points: 100, desc: "Style the pages so they are clear, consistent, and work on small screens." },
+    { id: 4, title: "Homework 3 (Models and Views)", due: due(-48), weight: 100, points: 100, desc: "Create the Assignment and Submission models and generate every page from the database." },
+    { id: 5, title: "Homework 4 (Controllers)", due: due(-34), weight: 100, points: 100, desc: "Handle grade and file submissions, with clear error messages for invalid input." },
+    { id: 6, title: "Homework 5 (Users and Permissions)", due: due(4), weight: 100, points: 100, desc: "Add login, customize each page by role, and lock down grading and file access." },
+    { id: 7, title: "Homework 6 (JavaScript)", due: due(18), weight: 100, points: 100, desc: "Add sortable tables, asynchronous uploads, and a what if grade calculator." },
+    { id: 8, title: "Homework 7 (AWS)", due: due(32), weight: 100, points: 100, desc: "Deploy the app to AWS with a custom domain and HTTPS." },
+  ];
+
+  const initialSubmissions = () => [
+    { id: 1, assignment: 1, author: "a", grader: "g", score: 1, file: "a.pdf" },
+    { id: 2, assignment: 1, author: "b", grader: "h", score: 1, file: "b.pdf" },
+    { id: 3, assignment: 1, author: "c", grader: "g", score: null, file: "c.pdf" },
+    { id: 4, assignment: 2, author: "a", grader: "g", score: 93, file: "a1.pdf" },
+    { id: 5, assignment: 2, author: "b", grader: "h", score: null, file: "b1.pdf" },
+    { id: 6, assignment: 2, author: "c", grader: "g", score: 88, file: "c1.pdf" },
+    { id: 7, assignment: 2, author: "d", grader: "h", score: 95, file: "d1.pdf" },
+    { id: 8, assignment: 3, author: "a", grader: "g", score: null, file: "a2.pdf" },
+    { id: 9, assignment: 3, author: "b", grader: "h", score: 81, file: "b2.pdf" },
+    { id: 10, assignment: 3, author: "c", grader: "g", score: null, file: "c2.pdf" },
+    { id: 11, assignment: 4, author: "b", grader: "h", score: 90, file: "b3.pdf" },
+    { id: 12, assignment: 4, author: "c", grader: "g", score: null, file: "c3.pdf" },
+    { id: 13, assignment: 4, author: "d", grader: "h", score: null, file: "d3.pdf" },
+    { id: 14, assignment: 5, author: "d", grader: "h", score: 77, file: "d4.pdf" },
+  ];
+
+  let submissions = initialSubmissions();
+  let nextId = 100;
+  let me = null;
+
+  const app = document.getElementById("gapp");
+  const urlBar = document.getElementById("url-bar");
+  const devtools = document.getElementById("devtools");
+  const MAX_UPLOAD = 64 * 1024 * 1024;
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  /* ── HELPERS ── */
+  const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const fmtShort = (d) => MONTHS[d.getMonth()].slice(0, 3) + " " + String(d.getDate()).padStart(2, "0");
+  const fmtLong = (d) => MONTHS[d.getMonth()] + " " + String(d.getDate()).padStart(2, "0");
+  const plural = (n) => (n === 1 ? "" : "s");
+  const role = () => (me ? users[me].role : null);
+  const getAssignment = (id) => assignments.find((a) => a.id === id);
+  const overdue = (a) => a.due < new Date();
+  const fmtScore = (n) => String(Math.round(n * 100) / 100);
+
+  function shell(title, inner) {
+    const who = me ? `<span class="gapp-who">Logged in as ${esc(users[me].name)}</span>` : "";
+    return `<div class="gapp-nav"><nav class="gapp-nav-inner" aria-label="Demo app">
+        <strong>CS3550</strong>
+        <a href="#" data-go="index">Assignments</a>
+        <a href="#" data-go="profile">Profile</a>${who}
+      </nav></div>
+      <div class="gapp-main"><div class="gapp-heading">${title}</div><div class="gapp-line"></div><div class="gapp-spacing"></div>${inner}</div>`;
+  }
+
+  function go(page, arg) {
+    if (!me && page !== "login") page = "login";
+    devtools.classList.toggle("show", page === "submissions" && role() === "ta");
+    ({ login: renderLogin, index: renderIndex, assignment: renderAssignment, submissions: renderSubmissions, profile: renderProfile })[page](arg);
+    app.scrollTop = 0;
+  }
+
+  /* ── LOGIN ── */
+  function renderLogin(error) {
+    urlBar.textContent = "localhost:8000/profile/login/";
+    app.innerHTML = shell("Login", `
+      <form id="login-form" novalidate>
+        ${error ? `<output class="error-msg">${esc(error)}</output><div class="gapp-spacing"></div>` : ""}
+        <div class="login-row"><label for="g-user">Username:</label><input id="g-user" autocomplete="off" required></div>
+        <div class="login-row"><label for="g-pass">Password:</label><input id="g-pass" type="password" required></div>
+        <button class="login-btn" type="submit">Login</button>
+      </form>`);
+    app.querySelector("#login-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const u = app.querySelector("#g-user").value.trim();
+      const p = app.querySelector("#g-pass").value;
+      if (users[u] && p === u) login(u);
+      else renderLogin("Username and password do not match");
+    });
+  }
+
+  function login(u) {
+    me = u;
+    go("profile");
+  }
+
+  /* ── ASSIGNMENTS (sortable) ── */
+  function renderIndex() {
+    urlBar.textContent = "localhost:8000/";
+    const rows = assignments.map((a, i) => `
+      <tr data-index="${i + 1}">
+        <td><a class="gapp-link" href="#" data-go="assignment" data-id="${a.id}">${esc(a.title)}</a></td>
+        <td data-value="${a.due.getTime()}">${fmtShort(a.due)}</td>
+        <td class="num" data-value="${a.weight}">${a.weight}</td>
+      </tr>`).join("");
+    app.innerHTML = shell("All Assignments", `
+      <table class="sortable">
+        <thead><tr><th style="width:65%">Assignment</th><th class="sort-column">Due date</th><th class="sort-column num">Weight</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`);
+    makeSortable(app.querySelector("table"));
+  }
+
+  function makeSortable(table) {
+    table.querySelectorAll("th.sort-column").forEach((th) => {
+      th.setAttribute("role", "button");
+      th.setAttribute("tabindex", "0");
+      th.setAttribute("aria-sort", "none");
+      const sort = () => {
+        const index = Array.from(th.parentNode.children).indexOf(th);
+        const state = th.classList.contains("sort-asc") ? "descending" : th.classList.contains("sort-desc") ? "none" : "ascending";
+        table.querySelectorAll("th.sort-column").forEach((h) => { h.classList.remove("sort-asc", "sort-desc"); h.setAttribute("aria-sort", "none"); });
+        const tbody = table.querySelector("tbody");
+        const rows = Array.from(tbody.rows);
+        const value = (row) => { const v = parseFloat(row.cells[index].dataset.value); return Number.isNaN(v) ? -Infinity : v; };
+        if (state === "none") rows.sort((x, y) => x.dataset.index - y.dataset.index);
+        else {
+          th.classList.add(state === "ascending" ? "sort-asc" : "sort-desc");
+          th.setAttribute("aria-sort", state);
+          const dir = state === "ascending" ? 1 : -1;
+          rows.sort((x, y) => dir * (value(x) - value(y)));
+        }
+        rows.forEach((r) => tbody.appendChild(r));
+      };
+      th.addEventListener("click", sort);
+      th.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sort(); } });
+    });
+  }
+
+  /* ── ASSIGNMENT PAGE (upload with real PDF checks) ── */
+  function statusFor(a, sub) {
+    if (sub) {
+      if (sub.score !== null) return `Your submission, ${esc(sub.file)}, received ${fmtScore(sub.score)}/${a.points} points (${(sub.score / a.points * 100).toFixed(1)}%)`;
+      if (overdue(a)) return `Your submission, ${esc(sub.file)}, is being graded`;
+      return `Your current submission is ${esc(sub.file)}`;
+    }
+    return overdue(a) ? "You did not submit this assignment and received 0 points" : "No current submission";
+  }
+
+  function renderAssignment(id, error) {
+    const a = getAssignment(id);
+    urlBar.textContent = `localhost:8000/${a.id}/`;
+    let card;
+    if (role() === "student") {
+      const sub = submissions.find((s) => s.assignment === a.id && s.author === me);
+      card = `<div class="gapp-card">
+        <p>${statusFor(a, sub)}</p>
+        ${!overdue(a) ? `
+        <form id="upload-form" novalidate>
+          ${error ? `<output class="error-msg">${esc(error)}</output>` : ""}
+          <input type="file" id="upload-file" accept="application/pdf" aria-label="Choose a PDF to submit">
+          <button type="submit">Upload</button>
+          <p style="font-size:0.8rem; margin-top:0.6rem;">Try any file from your computer. Only real PDFs are accepted, even if you rename a file to end in .pdf. Nothing leaves your browser.</p>
+        </form>` : ""}
+      </div>`;
+    } else {
+      const all = submissions.filter((s) => s.assignment === a.id).length;
+      const mine = submissions.filter((s) => s.assignment === a.id && s.grader === me).length;
+      card = `<div class="gapp-card">
+        <p>Currently ${all}/${students.length} submission${plural(students.length)}</p>
+        ${role() === "ta" ? `<p>${mine} submission${plural(mine)} assigned to you</p>` : ""}
+        <a class="gapp-link" href="#" data-go="submissions" data-id="${a.id}">Grade</a>
+      </div>`;
+    }
+    app.innerHTML = shell(esc(a.title), `
+      <p>Due ${fmtLong(a.due)}, total of ${a.points} point${plural(a.points)}</p>
+      <div class="gapp-spacing"></div>${card}
+      <div class="gapp-spacing"></div><h4>Description</h4><div class="desc"><p>${esc(a.desc)}</p></div>`);
+
+    const form = app.querySelector("#upload-form");
+    if (form) form.addEventListener("submit", (e) => { e.preventDefault(); handleUpload(a, app.querySelector("#upload-file").files[0]); });
+  }
+
+  function handleUpload(a, file) {
+    // Same order as the server: size first (never read a huge file), then name, then the %PDF- signature
+    if (!file) return renderAssignment(a.id, "Please choose a file to upload");
+    if (file.size > MAX_UPLOAD) return renderAssignment(a.id, "File is too large. It needs to be 64 MiB or smaller");
+    if (!file.name.toLowerCase().endsWith(".pdf")) return renderAssignment(a.id, "File must be a PDF");
+    const reader = new FileReader();
+    reader.onload = () => {
+      const bytes = new Uint8Array(reader.result);
+      const signature = String.fromCharCode(...bytes);
+      if (signature !== "%PDF-") return renderAssignment(a.id, "File must be a PDF");
+      let sub = submissions.find((s) => s.assignment === a.id && s.author === me);
+      if (sub) { sub.file = file.name; sub.score = null; }   // keeps the same TA
+      else submissions.push({ id: nextId++, assignment: a.id, author: me, grader: pickGrader(a.id), score: null, file: file.name });
+      renderAssignment(a.id);
+      const card = app.querySelector(".gapp-card");
+      const note = document.createElement("p");
+      note.textContent = "Upload succeeded";
+      note.style.fontWeight = "700";
+      card.prepend(note);
+    };
+    reader.readAsArrayBuffer(file.slice(0, 5));
+  }
+
+  // The TA with the fewest submissions for this assignment
+  function pickGrader(assignmentId) {
+    const count = (ta) => submissions.filter((s) => s.assignment === assignmentId && s.grader === ta).length;
+    return ["g", "h"].sort((x, y) => count(x) - count(y))[0];
+  }
+
+  /* ── GRADING PAGE ── */
+  function changeGrade(sub, user, score) {
+    // Mirrors Submission.change_grade(): only the assigned TA or the admin
+    if (!(sub.grader === user || users[user].role === "admin")) throw new Error("PermissionDenied");
+    sub.score = score;
+  }
+
+  function processGrades(entries, assignment) {
+    const errors = {}, general = [];
+    for (const [key, raw] of entries) {
+      const id = Number(key.replace("grade-", ""));
+      const sub = submissions.find((s) => s.id === id && s.assignment === assignment.id);
+      if (!sub) { general.push(`There is no submission with ID ${esc(key.replace("grade-", ""))} for this assignment`); continue; }
+      const text = String(raw).trim();
+      let score = null;
+      if (text !== "") {
+        score = Number(text);
+        if (Number.isNaN(score)) { (errors[id] = errors[id] || []).push("Grade needs to be a number"); continue; }
+        if (score < 0 || score > assignment.points) { (errors[id] = errors[id] || []).push(`Grade must be between 0 and ${assignment.points}`); continue; }
+      }
+      try { changeGrade(sub, me, score); }
+      catch { (errors[id] = errors[id] || []).push("You are not assigned to grade this submission"); }
+    }
+    return { errors, general };
+  }
+
+  function renderSubmissions(id, result, typed) {
+    const a = getAssignment(id);
+    urlBar.textContent = `localhost:8000/${a.id}/submissions`;
+    if (role() === "student") {
+      app.innerHTML = shell("403 Forbidden", `<div class="forbidden"><h2>403</h2><p>Only TAs and the instructor can open the grading page.</p></div>`);
+      return;
+    }
+    const errors = (result && result.errors) || {};
+    const general = (result && result.general) || [];
+    const visible = submissions.filter((s) => s.assignment === a.id && (role() === "admin" || s.grader === me))
+      .sort((x, y) => x.author.localeCompare(y.author));
+    const rows = visible.map((s, i) => {
+      const errs = errors[s.id] || [];
+      const value = errs.length && typed ? typed[s.id] : (s.score === null ? "" : fmtScore(s.score));
+      return `<tr data-index="${i + 1}">
+        <td>${esc(users[s.author].name)}</td>
+        <td><a class="gapp-link" href="#" data-noop>Submission</a></td>
+        <td><input type="number" step="any" min="0" max="${a.points}" name="grade-${s.id}" value="${esc(value)}"
+              aria-label="Grade for ${esc(users[s.author].name)}" class="${errs.length ? "error-border" : ""}"></td>
+        <td>${errs.map((m) => `<output class="error-msg">${esc(m)}</output>`).join("")}</td>
+      </tr>`;
+    }).join("") || `<tr><td colspan="4">No submissions to grade yet.</td></tr>`;
+    app.innerHTML = shell(esc(a.title), `
+      <div>All grades out of ${a.points}</div><div class="gapp-spacing"></div>
+      <form id="grade-form" novalidate>
+        ${general.map((m) => `<p><output class="error-msg">${m}</output></p>`).join("")}
+        ${result && !general.length && !Object.keys(errors).length ? `<p style="font-weight:700">Grades saved.</p>` : ""}
+        <table><thead><tr><th style="width:30%">Student</th><th>Submission</th><th>Grade</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+        <div class="gapp-spacing"></div>
+        <button type="submit">Submit</button> <a class="gapp-link" href="#" data-go="assignment" data-id="${a.id}">Back to assignment</a>
+        <p style="font-size:0.8rem; margin-top:0.75rem;">Try a grade above ${a.points}, a negative number, or text. The page's own limits are switched off here so you can see the server side checks catch it.</p>
+      </form>`);
+    app.querySelector("#grade-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const entries = Array.from(e.target.querySelectorAll("input[name^=grade-]")).map((i) => [i.name, i.value]);
+      const typedValues = Object.fromEntries(entries.map(([k, v]) => [Number(k.replace("grade-", "")), v]));
+      renderSubmissions(a.id, processGrades(entries, a), typedValues);
+    });
+  }
+
+  /* ── CRAFTED REQUEST ── */
+  const crafted = { assignment: 2, submission: 5 };
+  document.getElementById("crafted-request").textContent =
+    `POST /${crafted.assignment}/submissions\nContent-Type: application/x-www-form-urlencoded\n\ngrade-${crafted.submission}=100`;
+  document.getElementById("crafted-send").addEventListener("click", () => {
+    const out = document.getElementById("crafted-result");
+    const sub = submissions.find((s) => s.id === crafted.submission);
+    const before = sub.score;
+    const result = processGrades([[`grade-${crafted.submission}`, "100"]], getAssignment(crafted.assignment));
+    const msg = (result.errors[crafted.submission] || [])[0];
+    out.innerHTML = msg
+      ? `<span class="bad">Rejected:</span> "${esc(msg)}". Ben's grade is still ${before === null ? "empty" : fmtScore(before)}.`
+      : `<span class="ok">Saved.</span>`;
+  });
+
+  /* ── PROFILE (grades + what if calculator) ── */
+  function renderProfile() {
+    urlBar.textContent = "localhost:8000/profile/";
+    const card = `<div class="gapp-card">Currently logged in as ${esc(users[me].name)} &emsp; <a class="gapp-link" href="#" data-logout>Log Out</a></div><div class="gapp-spacing"></div>`;
+
+    if (role() !== "student") {
+      const rows = assignments.map((a, i) => {
+        const subs = submissions.filter((s) => s.assignment === a.id && (role() === "admin" || s.grader === me));
+        const graded = subs.filter((s) => s.score !== null).length;
+        return `<tr data-index="${i + 1}"><td>${esc(a.title)}</td><td class="num" data-value="${graded}">${graded}/${subs.length}</td></tr>`;
+      }).join("");
+      app.innerHTML = shell("Grading progress", card + `
+        <table class="sortable"><thead><tr><th style="width:80%">Assignment</th><th class="sort-column num">Graded</th></tr></thead><tbody>${rows}</tbody></table>`);
+      makeSortable(app.querySelector("table"));
+      return;
+    }
+
+    let earned = 0, available = 0;
+    const rows = assignments.map((a, i) => {
+      const sub = submissions.find((s) => s.assignment === a.id && s.author === me);
+      let text, value = "";
+      if (sub && sub.score !== null) {
+        const pct = sub.score / a.points * 100;
+        text = pct.toFixed(1) + "%"; value = pct;
+        earned += pct / 100 * a.weight; available += a.weight;
+      } else if (sub) text = "Ungraded";
+      else if (overdue(a)) { text = "Missing"; value = 0; available += a.weight; }
+      else text = "Not Due";
+      return `<tr data-index="${i + 1}"><td><a class="gapp-link" href="#" data-go="assignment" data-id="${a.id}">${esc(a.title)}</a></td>
+        <td class="num" data-weight="${a.weight}" data-value="${value}">${text}</td></tr>`;
+    }).join("");
+    const final = available ? earned / available * 100 : 100;
+    app.innerHTML = shell("Your grades", card + `
+      <button type="button" id="hypo-btn">Hypothesize</button>
+      <table class="sortable" id="hypo-table">
+        <thead><tr><th style="width:80%">Assignment</th><th class="sort-column num">Graded</th></tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr><td><strong>Final Grade</strong></td><td class="num final-grade">${final.toFixed(2)}%</td></tr></tfoot>
+      </table>`);
+    makeSortable(app.querySelector("table"));
+    setUpHypothesize(app.querySelector("#hypo-table"), app.querySelector("#hypo-btn"));
+  }
+
+  function setUpHypothesize(table, button) {
+    const cells = () => Array.from(table.querySelectorAll("tbody td:last-child"));
+    const recalc = () => {
+      let earned = 0, available = 0;
+      cells().forEach((cell) => {
+        const weight = Number(cell.dataset.weight);
+        const input = cell.querySelector("input");
+        let pct = null;
+        if (input) { if (input.value !== "") pct = Number(input.value); }
+        else if (cell.textContent === "Missing") pct = 0;
+        else if (cell.textContent !== "Ungraded" && cell.textContent !== "Not Due") pct = Number(cell.dataset.value);
+        if (pct !== null && !Number.isNaN(pct)) { earned += pct / 100 * weight; available += weight; }
+      });
+      table.querySelector(".final-grade").textContent = (available ? earned / available * 100 : 100).toFixed(2) + "%";
+    };
+    button.addEventListener("click", () => {
+      const on = table.classList.toggle("hypothesized");
+      button.textContent = on ? "Actual grades" : "Hypothesize";
+      cells().forEach((cell) => {
+        if (on && (cell.textContent === "Not Due" || cell.textContent === "Ungraded")) {
+          cell.dataset.original = cell.textContent;
+          const input = document.createElement("input");
+          input.type = "number"; input.min = "0"; input.max = "100"; input.step = "any"; input.placeholder = "%";
+          input.setAttribute("aria-label", "Hypothetical grade in percent");
+          input.addEventListener("input", recalc);
+          cell.textContent = ""; cell.appendChild(input);
+        } else if (!on && cell.dataset.original) {
+          cell.textContent = cell.dataset.original; delete cell.dataset.original;
+        }
+      });
+      recalc();
+      if (on) { const first = table.querySelector("tbody input"); if (first) first.focus(); }
+    });
+  }
+
+  /* ── NAVIGATION ── */
+  app.addEventListener("click", (e) => {
+    const link = e.target.closest("[data-go], [data-logout], [data-noop]");
+    if (!link) return;
+    e.preventDefault();
+    if (link.hasAttribute("data-logout")) { me = null; submissions = initialSubmissions(); return go("login"); }
+    if (link.hasAttribute("data-noop")) return;
+    go(link.dataset.go, link.dataset.id ? Number(link.dataset.id) : undefined);
+  });
+  document.querySelectorAll("[data-login]").forEach((b) => b.addEventListener("click", () => login(b.dataset.login)));
+
+  go("login");
+
+  /* ── RUN IT YOURSELF ── */
+  document.querySelectorAll(".run-step-header").forEach((header) => {
+    header.addEventListener("click", () => {
+      const open = header.parentElement.classList.toggle("open");
+      header.setAttribute("aria-expanded", String(open));
+    });
+  });
+  document.querySelectorAll(".code-copy-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      navigator.clipboard.writeText(btn.dataset.copy).then(() => {
+        btn.textContent = "Copied!"; btn.style.color = "#C8F135";
+        setTimeout(() => { btn.textContent = "Copy"; btn.style.color = ""; }, 2000);
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

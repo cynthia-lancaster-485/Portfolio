@@ -42,8 +42,8 @@ Security rules live in one place, the `Submission` model, so every view enforces
 You need Python 3.11 or newer.
 
 ```bash
-git clone https://github.com/cynthia-lancaster-485/django-grading-app.git
-cd django-grading-app
+git clone https://github.com/cynthia-lancaster-485/Portfolio.git
+cd "Portfolio/Grading App"
 python3 -m venv .venv
 source .venv/bin/activate        # on Windows: .venv\Scripts\activate
 pip install -r requirements.txt
@@ -67,7 +67,7 @@ Open http://localhost:8000 and log in with any sample account. Each password is 
 python3 manage.py test grades
 ```
 
-21 tests cover login and redirects, upload validation, file permissions, TA assignment, grade validation (including crafted requests), and the weighted grade calculation. They run automatically on every push with GitHub Actions.
+21 tests cover login and redirects, upload validation, file permissions, TA assignment, grade validation (including crafted requests), and the weighted grade calculation. They run automatically with GitHub Actions whenever this folder changes.
 
 ## Deployment
 
