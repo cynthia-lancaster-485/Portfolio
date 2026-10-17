@@ -1,251 +1,234 @@
-#!usr/bin/python
+#!/usr/bin/env python3
 import socket
 import sys
 import signal
-from optparse import OptionParser
-import urllib.parse
-from time import *
 import threading
-from datetime import datetime
+import urllib.parse
+from datetime import datetime, timezone
+from email.utils import format_datetime
+from optparse import OptionParser
 
-#Stores cached items
-cache = {
-    "URL": b"bytes"
-}
-# Stores blocked websites
+# Methods defined by HTTP that this proxy recognizes but does not implement (501).
+# Anything else is not a valid method at all (400).
+KNOWN_METHODS = {"HEAD", "POST", "PUT", "DELETE", "LINK", "UNLINK", "OPTIONS", "PATCH", "TRACE", "CONNECT"}
 
-blockList = ["test"]
+# URL -> (full response bytes, value to send back in If-Modified-Since)
+cache = {}
+blockList = []
 cacheEnabled = False
 blockingEnabled = False
-timestamp = 1528797322
-today = datetime.fromtimestamp(timestamp)
-dateFormat = today.strftime("%a, %b %d %Y %H:%M:%S")
-def ctrl_c_pressed(signal, frame): 
+state_lock = threading.Lock()
+
+
+def ctrl_c_pressed(signal, frame):
     sys.exit(0)
-# Start of program execution
-# Parse out the command line server address and port number to listen to
-parser = OptionParser()
-parser.add_option('-p', type='int', dest='serverPort')
-parser.add_option('-a', type='string', dest='serverAddress')
-(options, args) = parser.parse_args()
-port = options.serverPort
-address = options.serverAddress
-if address is None:
-    address = 'localhost'
-if port is None:
-    port = 2100
-#Checks header for errors
+
+
+def send_response(client_socket, status):
+    client_socket.sendall(f"HTTP/1.0 {status}\r\n\r\n".encode())
+
+
 def headerErrorCheck(headerData, client_socket):
-    if(headerData[0]=="POST" or headerData[0]=="HEAD" or headerData[0]=="PUT" or headerData[0]=="DELETE"):
-        commandError = (f"HTTP/1.0 501 Not Implemented\r\n")
-        client_socket.sendall(commandError.encode())
-        client_socket.close()
-        return
-    if(headerData[0]!='GET'):
-        commandError = (f"HTTP/1.0 400 Bad Request\r\n")
-        client_socket.sendall(commandError.encode())
-        client_socket.close()
-        return
-    if((len(headerData) < 3) or headerData[2]!='HTTP/1.0'):
-        headerError = (f"HTTP/1.0 400 Bad Request\r\n")
-        client_socket.sendall(headerError.encode())
-        client_socket.close()
-        return
-#hanfles requests for enabling and disabling the cahce and blocking
-def handle_proxy_req(client_socket, urlData):
-    global cacheEnabled
-    global blockingEnabled
-    if(urlData.path=="/proxy/cache/enable"):
-        cacheEnabled = True
-        error = (f"HTTP/1.0 400 Bad Request\r\n")
-        client_socket.sendall(error.encode())
-        client_socket.close()
+    """Returns True (after sending the error) if the request line is invalid."""
+    if len(headerData) != 3:
+        send_response(client_socket, "400 Bad Request")
         return True
-    if(urlData.path=="/proxy/cache/disable"):
-        cacheEnabled = False
-        error = (f"HTTP/1.0 400 Bad Request\r\n")
-        client_socket.sendall(error.encode())
-        client_socket.close()
+    method, _, version = headerData
+    if method in KNOWN_METHODS:
+        send_response(client_socket, "501 Not Implemented")
         return True
-    if(urlData.path=="/proxy/cache/flush"):
-        cache.clear()
-        error = (f"HTTP/1.0 400 Bad Request\r\n")
-        client_socket.sendall(error.encode())
-        client_socket.close()
+    if method != "GET" or version != "HTTP/1.0":
+        send_response(client_socket, "400 Bad Request")
         return True
-    if(urlData.path=="/proxy/blocklist/enable"):
-        blockingEnabled = True
-        error = (f"HTTP/1.0 400 Bad Request\r\n")
-        client_socket.sendall(error.encode())
-        client_socket.close()
-        return True
-    if(urlData.path=="/proxy/blocklist/disable"):
-        blockingEnabled = False
-        error = (f"HTTP/1.0 400 Bad Request\r\n")
-        client_socket.sendall(error.encode())
-        client_socket.close()
-        return
-    if(urlData.path=="/proxy/blocklist/flush"):
-        blockList.clear()
-        error = (f"HTTP/1.0 400 Bad Request\r\n")
-        client_socket.sendall(error.encode())
-        client_socket.close()
-        return True
-#handles block list operations
-def handle_blocking_req(urlData, client_socket, origin, newPort):
-    if("/proxy/blocklist/add/" in urlData.path):
-        blockLines = urlData.path.split("/", 4)
-        if(blockLines[4] not in blockList):
-            blockList.append(blockLines[4])
-        addBlocking = (f"HTTP/1.0 400 Bad Request\r\n")
-        client_socket.sendall(addBlocking.encode())
-        client_socket.close()
-        origin.close()
-        return True
-    if("/proxy/blocklist/remove/" in urlData.path):
-        blockLines = urlData.path.split("/", 4)
-        if(blockLines[4] in blockList):
-            blockList.remove(blockLines[4])
-        removeBlocking = (f"HTTP/1.0 400 Bad Request\r\n")
-        client_socket.sendall(removeBlocking.encode())
-        client_socket.close()
-        origin.close()
-        return True
-    if("/proxy/blocklist/flush/" in urlData.path):
-        blockList.clear()
-        flushBlocking = (f"HTTP/1.0 400 Bad Request\r\n")
-        client_socket.sendall(flushBlocking.encode())
-        client_socket.close()
-        origin.close()
-        return True
-    for block in blockList: 
-        if(blockingEnabled and (urlData.hostname.count(block) or str(newPort)==block or urlData.hostname + ":" + str(newPort)==block)):
-            Blocking = (f"HTTP/1.0 403 Forbidden\r\n")
-            client_socket.sendall(Blocking.encode())
-            client_socket.close()
-            origin.close()
-            return True
+    return False
 
-#Handles each client that comes in
-def handle_client(client_socket, client_addr):
-    # recv request
-    # parse request
-    # fetch data from origin
-    # send response
-    content = ""
-    urlData = ""
-    newPort = 0
-    lastModified = ""
-    #Receives all the data from the client
-    while True:
-        recievingData = client_socket.recv(1024).decode()
-        print(recievingData)
-        content += recievingData
-        if("\r\n\r\n" in content):
-            break
-    #We split the data from the client into lines, and then check the header data to create a request
-    lines = content.split('\r\n')
-    headerData = lines[0].split(" ")
-    headerErrorCheck(headerData, client_socket)
-    #Parsing the URL
-    urlData = urllib.parse.urlparse(headerData[1], scheme='', allow_fragments=True)
-    if(handle_proxy_req(client_socket, urlData)):
-        return
-    newPort = urlData.port
-    #parsing through the other headers to store the data correctly 
-    extraHeader = ""
-    for headder_lines in lines[1: ]:
-        if(headder_lines==""):
+
+def parse_headers(lines, client_socket):
+    """Returns the client's headers as a list of lines, or None (after sending
+    a 400) if any header is not in "Name: value" form."""
+    headers = []
+    for line in lines:
+        if line == "":
             continue
-        header = headder_lines.split(": ", 1)
-        if(header[0].endswith(" ")):
-            headerError = (f"HTTP/1.0 400 Bad Request\r\n")
-            client_socket.sendall(headerError.encode())
-            client_socket.close()
-            return
-        if((len(header)!=2 and len(header)>0)):
-            headerError = (f"HTTP/1.0 400 Bad Request\r\n")
-            client_socket.sendall(headerError.encode())
-            client_socket.close()
-            return
-        extraHeader += headder_lines + "\r\n"
-        if("Connection: keep-alive" in extraHeader):
-            extraHeader = extraHeader.replace("Connection: keep-alive", "Connection: close", 1)
-    dataR = f"GET {urlData.path} HTTP/1.0\r\nHost: {urlData.netloc}{extraHeader}\r\nLast-Modified: {dateFormat}\r\nConnection: close\r\n\r\n" 
-    print(dataR)
-    if not urlData.port:
-        newPort = 80
-    else:
-        newPort = urlData.port
-    with  socket.socket(socket.AF_INET, socket.SOCK_STREAM) as origin:
-        if(urlData.hostname==None or urlData.scheme!='http' or urlData.netloc==None or urlData.path==''):
-            error = (f"HTTP/1.0 400 Bad Request\r\n")
-            client_socket.sendall(error.encode())
-            client_socket.close()
-            origin.close()
-            return 
+        name, sep, value = line.partition(": ")
+        if not sep or not name or " " in name or ":" in name:
+            send_response(client_socket, "400 Bad Request")
+            return None
+        headers.append(line)
+    return headers
+
+
+def handle_proxy_req(client_socket, urlData):
+    """Handles the /proxy/... control URLs. Returns True if this was one."""
+    global cacheEnabled, blockingEnabled
+    path = urlData.path
+    if not path.startswith("/proxy/"):
+        return False
+
+    with state_lock:
+        if path == "/proxy/cache/enable":
+            cacheEnabled = True
+        elif path == "/proxy/cache/disable":
+            cacheEnabled = False
+        elif path == "/proxy/cache/flush":
+            cache.clear()
+        elif path == "/proxy/blocklist/enable":
+            blockingEnabled = True
+        elif path == "/proxy/blocklist/disable":
+            blockingEnabled = False
+        elif path == "/proxy/blocklist/flush":
+            blockList.clear()
+        elif path.startswith("/proxy/blocklist/add/"):
+            entry = path[len("/proxy/blocklist/add/"):]
+            if entry and entry not in blockList:
+                blockList.append(entry)
+        elif path.startswith("/proxy/blocklist/remove/"):
+            entry = path[len("/proxy/blocklist/remove/"):]
+            if entry in blockList:
+                blockList.remove(entry)
         else:
-            #Handle blocking 
-            if(handle_blocking_req(urlData, client_socket, origin, newPort)):
-                return
-            origin.connect((urlData.hostname, newPort))
-            #Handles caching if needed
-            if(cacheEnabled and dataR in cache):
-                splitHeader = cache[dataR].split(b"\r\n")
-                for headerLine in splitHeader:
-                    if(headerLine.count(b'Last-Modified:')):
-                        lastModified = headerLine.decode()[15:]
-                        break
-                if(len(lastModified) > 0):
-                    #updatedReq = dataR[: dataR.find('\r\n')] + "\r\nIf-Modified-Since: " + lastModified + dataR[dataR.find('\r\n'):]
-                    updatedReq = f"GET {urlData.path} HTTP/1.0\r\nHost: {urlData.netloc}{extraHeader}\r\nIf-Modified-Since: {lastModified}\r\nConnection: close\r\n\r\n" 
-                    origin.sendall(updatedReq.encode())
-                originBytes = b""
-                while True:
-                    temp = origin.recv(4096)
-                    originBytes += temp
-                    if(temp==b""):
-                        break 
-                if(b'200 OK' in originBytes):
-                    cache.update({updatedReq: originBytes})
-                else :
-                    client_socket.sendall(cache[dataR])
-                    origin.close()
-                    client_socket.close()
-                    return
-            #Sends request to server and recevies data back to send to the client
-            origin.sendall(dataR.encode())
-            originBytes = b""
-            while True:
-                temp = origin.recv(4096)
-                originBytes += temp
-                if(temp==b""):
-                    break     
-            if not originBytes:
-                origin.close()
-                client_socket.close()
-                return
-            while len(originBytes)==4096:
-                originBytes += recievingData
-            if(cacheEnabled):
-                cache.update({dataR: originBytes})
-            client_socket.sendall(originBytes)
-            origin.close()
-            client_socket.close()
-    print('Client request handled')
+            return False
+
+    send_response(client_socket, "200 OK")
+    return True
 
 
-# Set up signal handling (ctrl-c)
-signal.signal(signal.SIGINT, ctrl_c_pressed)
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as skt:
+def handle_blocking_req(urlData, client_socket, port):
+    """Sends 403 Forbidden and returns True if the host is on the blocklist."""
+    with state_lock:
+        if not blockingEnabled:
+            return False
+        entries = list(blockList)
 
-    skt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    skt.bind((address, port))
-    skt.listen()
-    print(f"Listening on {(address, port)}")
+    host_and_port = f"{urlData.hostname}:{port}"
+    for block in entries:
+        # An entry like "example:80" blocks hosts containing "example" on port 80.
+        if ":" in block:
+            block_host, _, block_port = block.rpartition(":")
+            blocked = block_host in urlData.hostname and block_port == str(port)
+        else:
+            blocked = block in host_and_port
+        if blocked:
+            send_response(client_socket, "403 Forbidden")
+            return True
+    return False
+
+
+def read_until_closed(sock):
+    data = b""
     while True:
-        clientSocket, addr = skt.accept()
-        print(f"Connection on {addr} has been established")
-        #sets up a thread for each client
-        threading.Thread(target=handle_client, args=(clientSocket, addr)).start()
-    
+        chunk = sock.recv(4096)
+        if not chunk:
+            return data
+        data += chunk
+
+
+def fetch(host, port, request):
+    with socket.create_connection((host, port)) as origin:
+        origin.sendall(request.encode())
+        return read_until_closed(origin)
+
+
+def status_code(response):
+    parts = response.split(b"\r\n", 1)[0].split(b" ")
+    return parts[1].decode() if len(parts) > 1 else ""
+
+
+def header_value(response, name):
+    head = response.split(b"\r\n\r\n", 1)[0].decode("latin-1")
+    for line in head.split("\r\n")[1:]:
+        key, _, value = line.partition(":")
+        if key.strip().lower() == name.lower():
+            return value.strip()
+    return None
+
+
+def handle_client(client_socket, client_addr):
+    try:
+        # Read until the blank line that ends the request headers.
+        content = b""
+        while b"\r\n\r\n" not in content:
+            data = client_socket.recv(1024)
+            if not data:
+                return
+            content += data
+        lines = content.decode("latin-1").split("\r\n\r\n", 1)[0].split("\r\n")
+
+        headerData = lines[0].split(" ")
+        if headerErrorCheck(headerData, client_socket):
+            return
+
+        urlData = urllib.parse.urlparse(headerData[1])
+        if urlData.scheme != "http" or not urlData.hostname or urlData.path == "":
+            send_response(client_socket, "400 Bad Request")
+            return
+
+        clientHeaders = parse_headers(lines[1:], client_socket)
+        if clientHeaders is None:
+            return
+
+        if handle_proxy_req(client_socket, urlData):
+            return
+
+        port = urlData.port or 80
+        if handle_blocking_req(urlData, client_socket, port):
+            return
+
+        path = urlData.path + (f"?{urlData.query}" if urlData.query else "")
+        # Host and Connection are always set by the proxy, so drop the client's copies.
+        extraHeader = "".join(h + "\r\n" for h in clientHeaders
+                              if h.split(":", 1)[0].lower() not in ("host", "connection"))
+        dataR = f"GET {path} HTTP/1.0\r\nHost: {urlData.netloc}\r\n{extraHeader}Connection: close\r\n\r\n"
+
+        url = urllib.parse.urlunparse(("http", urlData.netloc, urlData.path, "", urlData.query, ""))
+        with state_lock:
+            useCache = cacheEnabled
+            cached = cache.get(url) if useCache else None
+
+        servedFromCache = False
+        if cached:
+            cachedResponse, lastModified = cached
+            conditional = dataR[:-2] + f"If-Modified-Since: {lastModified}\r\n\r\n"
+            response = fetch(urlData.hostname, port, conditional)
+            if status_code(response) == "304":
+                response = cachedResponse
+                servedFromCache = True
+        else:
+            response = fetch(urlData.hostname, port, dataR)
+
+        if useCache and not servedFromCache and status_code(response) == "200":
+            # Prefer the server's own Last-Modified; otherwise use the time we cached it.
+            lastModified = (header_value(response, "Last-Modified")
+                            or format_datetime(datetime.now(timezone.utc), usegmt=True))
+            with state_lock:
+                cache[url] = (response, lastModified)
+
+        client_socket.sendall(response)
+    except OSError:
+        try:
+            send_response(client_socket, "502 Bad Gateway")
+        except OSError:
+            pass
+    finally:
+        client_socket.close()
+
+
+def main():
+    parser = OptionParser()
+    parser.add_option('-p', type='int', dest='serverPort', default=2100)
+    parser.add_option('-a', type='string', dest='serverAddress', default='localhost')
+    (options, args) = parser.parse_args()
+
+    signal.signal(signal.SIGINT, ctrl_c_pressed)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as skt:
+        skt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        skt.bind((options.serverAddress, options.serverPort))
+        skt.listen()
+        print(f"Listening on {(options.serverAddress, options.serverPort)}")
+        while True:
+            clientSocket, addr = skt.accept()
+            threading.Thread(target=handle_client, args=(clientSocket, addr), daemon=True).start()
+
+
+if __name__ == "__main__":
+    main()
