@@ -457,7 +457,7 @@
     </div>
     <div class="hero-stats">
       <div class="stat-item">
-        <div class="stat-num">5</div>
+        <div class="stat-num">6</div>
         <div class="stat-label">Featured projects</div>
       </div>
       <div class="stat-item">
@@ -611,6 +611,41 @@ Connection: close
             </p>
             <div class="project-impact" style="margin-top: 0.5rem;">✦ Python · Sockets · Threads · TCP/IP · Automated tests</div>
             <span class="project-link" style="margin-top: 0.75rem;">View code on GitHub <span class="arrow">↗</span></span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Security — Full width -->
+      <a href="security_case_study.html" class="project-card full">
+        <div class="full-inner" style="display:grid; grid-template-columns: 1fr 1fr;">
+          <div class="project-info" style="padding: 2.5rem;">
+            <div class="project-tags">
+              <span class="tag">Security</span>
+              <span class="tag">Offense &amp; defense</span>
+              <span class="tag">Python</span>
+              <span class="tag highlight">Attacker's mindset</span>
+            </div>
+            <h3 class="project-title" style="font-size: 1.7rem;">Security: Learning to Build Securely by Breaking Things</h3>
+            <p class="project-desc" style="font-size: 0.95rem;">
+              A semester of attacking systems the way an adversary would, then defending them:
+              web exploitation (SQL injection, XSS, CSRF), cryptographic attacks (RSA padding
+              oracle, hash length extension), network packet analysis, and intrusion detection.
+              It is why I build with security in mind from the start.
+            </p>
+            <div class="project-impact" style="margin-top: 0.5rem;">✦ Web security · Cryptography · Network security · Detection</div>
+            <span class="project-link" style="margin-top: 0.75rem;">View case study <span class="arrow">↗</span></span>
+          </div>
+          <div class="project-thumb landscape" style="border-radius: 0; height: auto; min-height: 300px; aspect-ratio: auto; background:#0F1117; overflow:hidden; align-items:center; justify-content:flex-start;">
+            <pre aria-hidden="true" style="margin:0; padding:2rem; font-family:'SF Mono','Fira Code',monospace; font-size:clamp(0.6rem, 2.4vw, 0.8rem); line-height:1.8; color:#e2e8f0; white-space:pre;"><span style="color:#6b7686;"># the attacker controls everything</span>
+<span style="color:#6b7686;"># on the outside of your system</span>
+
+input      <span style="color:#C8F135;">&rarr; validate on the server</span>
+headers    <span style="color:#C8F135;">&rarr; never trust</span>
+tokens     <span style="color:#C8F135;">&rarr; assume forgeable</span>
+uploads    <span style="color:#C8F135;">&rarr; check the bytes</span>
+
+<span style="color:#6b7686;"># you can only defend what</span>
+<span style="color:#6b7686;"># you know how to break</span></pre>
           </div>
         </div>
       </a>
