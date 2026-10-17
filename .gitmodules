@@ -1,3 +1,0 @@
-[submodule "static/jquery"]
-	path = static/jquery
-	url = https://github.com/jquery/jquery

@@ -1,4 +1,4 @@
-import { $ } from "/static/jquery/src/jquery.js";
+import { $ } from "/static/vendor/jquery.module.min.js";
 function say_hi(elt) {
     console.log("Welcome to", elt.text());
 }
