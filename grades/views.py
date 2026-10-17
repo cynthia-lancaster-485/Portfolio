@@ -178,7 +178,15 @@ def submissions(request, assignment_id):
             return redirect(f"/{assignment_id}/submissions")
 
     # Pair each submission with its errors so the template can show them on the right row
-    rows = [{'submission': submission, 'errors': errors.get(submission.id, [])} for submission in submissions]
+    # After a failed save, show what the TA typed instead of the old saved grade
+    rows = []
+    for submission in submissions:
+        row_errors = errors.get(submission.id, [])
+        if row_errors:
+            value = request.POST.get(f"grade-{submission.id}", "")
+        else:
+            value = "" if submission.score is None else f"{submission.score:g}"
+        rows.append({'submission': submission, 'errors': row_errors, 'value': value})
 
     # Errors for submissions not shown on this page (e.g. a crafted POST) go at the top
     shown_ids = {row['submission'].id for row in rows}

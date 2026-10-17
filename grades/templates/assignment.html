@@ -16,7 +16,7 @@
         <div class="blue-bkgrd">
             <p>{{status}}</p>
                 {% if user_submission %}
-                    <p>Current submission: <a href="{{ user_submission.file.url }}">{{ user_submission.file.name }}</a></p>
+                    <p><a href="{{ user_submission.file.url }}">Download your submission</a></p>
                 {% endif %}
                 {% if not overdue %}
                     <form class="submission-form" action="/{{ assignment.id }}/" method="post" enctype="multipart/form-data">

@@ -37,7 +37,7 @@
                             <input type="number" step="any" min="0" max="{{ assignment.points }}"
                                    name="grade-{{ row.submission.id }}"
                                    aria-label="Grade for {{ row.submission.author.get_full_name }}"
-                                   value="{{ row.submission.score|default_if_none:'' }}"
+                                   value="{{ row.value }}"
                                    class="{% if row.errors %}error-border{% endif %}">
                         </td>
                         <td>

@@ -5,10 +5,11 @@ A course gradebook where students upload PDF assignments, teaching assistants gr
 **Stack:** Python, Django 5, SQLite, Django templates, JavaScript (ES modules), jQuery, HTML, CSS
 **Originally deployed on:** AWS EC2 (Ubuntu), NGINX reverse proxy, custom domain, HTTPS with Let's Encrypt
 
-<!-- Add screenshots here, for example:
-![Student gradebook with the what if calculator](docs/profile.png)
-![TA grading page with validation errors](docs/grading.png)
--->
+![Student gradebook with the what if calculator turned on](docs/what-if-calculator.png)
+
+| TA grading with validation | Student assignment page |
+| --- | --- |
+| ![A grade above the point limit is rejected with an inline error](docs/ta-grading-validation.png) | ![Student upload card on an assignment page](docs/assignment-upload.png) |
 
 ## What it does
 

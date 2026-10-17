@@ -182,6 +182,7 @@ class GradingTests(GradesTestCase):
         self.login(self.ta1)
         response = self.client.post(self.url, {f"grade-{self.alice_sub.id}": "500"})
         self.assertContains(response, "Grade must be between 0 and 50")
+        self.assertContains(response, 'value="500"')
         self.alice_sub.refresh_from_db()
         self.assertIsNone(self.alice_sub.score)
 

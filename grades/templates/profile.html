@@ -15,7 +15,7 @@
         <div class="spacing"></div>
     
         <div class="blue-bkgrd">
-            Currently logged in as {{ user }}  &emsp;  &emsp;<a class="profile" href="/profile/logout/"> Log Out</a>
+            Currently logged in as {{ user.get_full_name|default:user.username }}  &emsp;  &emsp;<a class="profile" href="/profile/logout/"> Log Out</a>
         </div>
     
         <div class="spacing"></div>
