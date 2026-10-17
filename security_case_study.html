@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security Coursework — Cynthia Lancaster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --lime: #C8F135; --lime-dark: #9DC418;
+      --ink: #1A1A18; --paper: #F5F2EB;
+      --muted: #7A7A72; --border: rgba(26,26,24,0.12); --radius: 20px;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); line-height: 1.6; overflow-x: hidden; }
+
+    nav.site-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 3rem; border-bottom: 1px solid var(--border); background: var(--paper); position: sticky; top: 0; z-index: 200; }
+    .nav-logo { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; text-decoration: none; color: var(--ink); }
+    .nav-back { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--muted); font-size: 0.85rem; }
+    .nav-back:hover { color: var(--ink); }
+
+    .case-hero { padding: 5rem 3rem 4rem; max-width: 1100px; margin: 0 auto; }
+    .eyebrow { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .eyebrow::before { content: ''; width: 32px; height: 2px; background: var(--lime-dark); display: inline-block; }
+    .case-title { font-family: 'Fraunces', serif; font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 1.5rem; }
+    .case-title em { font-style: italic; color: var(--lime-dark); }
+    .case-sub { font-size: 1.1rem; color: var(--muted); max-width: 640px; line-height: 1.7; margin-bottom: 3rem; }
+    .case-meta { display: flex; gap: 3rem; flex-wrap: wrap; }
+    .meta-item label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.25rem; }
+    .meta-item span { font-size: 0.95rem; font-weight: 500; }
+
+    .case-section { padding: 5rem 3rem; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section-heading { font-family: 'Fraunces', serif; font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    .prose { color: var(--muted); font-size: 1rem; line-height: 1.8; max-width: 680px; }
+    .prose + .prose { margin-top: 1rem; }
+    .full-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+    .area-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 2.5rem; }
+    .area-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; }
+    .area-icon { font-size: 1.6rem; margin-bottom: 0.75rem; }
+    .area-tag { display: inline-block; background: #E8F5C8; color: #4A6B10; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.2rem 0.65rem; border-radius: 100px; margin-bottom: 0.75rem; }
+    .area-card h4 { font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .area-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.65; margin-bottom: 0.75rem; }
+    .area-card p:last-child { margin-bottom: 0; }
+    .area-list { list-style: none; margin-top: 0.5rem; }
+    .area-list li { font-size: 0.84rem; color: var(--muted); padding: 0.3rem 0; display: flex; gap: 0.6rem; }
+    .area-list li::before { content: '→'; color: var(--lime-dark); flex-shrink: 0; }
+
+    .chips { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 2rem; }
+    .chip { background: var(--lime); color: var(--ink); font-size: 0.82rem; font-weight: 500; padding: 0.4rem 1rem; border-radius: 100px; }
+
+    .note-box { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--lime-dark); border-radius: 12px; padding: 1.5rem 1.75rem; margin-top: 2rem; max-width: 760px; }
+    .note-box h4 { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .note-box p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+
+    .takeaway-section { background: var(--ink); color: #fff; padding: 5rem 3rem; }
+    .takeaway-inner { max-width: 1100px; margin: 0 auto; }
+    .takeaway-section .section-label { color: rgba(255,255,255,0.4); }
+    .takeaway-section .section-label::after { background: rgba(255,255,255,0.1); }
+    .takeaway-section .section-heading { color: #fff; }
+    .takeaway-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2.5rem; }
+    .takeaway-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius); padding: 1.75rem; }
+    .takeaway-num { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 700; color: var(--lime); margin-bottom: 0.75rem; }
+    .takeaway-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .takeaway-card p { font-size: 0.83rem; color: rgba(255,255,255,0.5); line-height: 1.65; }
+
+    .back-section { padding: 3rem; text-align: center; }
+    .back-link { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--muted); font-size: 0.9rem; }
+    .back-link:hover { color: var(--ink); }
+
+    @media (max-width: 900px) {
+      nav.site-nav { padding: 1rem 1.5rem; }
+      .case-hero, .case-section { padding: 3rem 1.5rem; }
+      .area-grid, .takeaway-grid { grid-template-columns: 1fr; }
+      .takeaway-section { padding: 3rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">Cynthia Lancaster.</a>
+  <a href="index.html#work" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+    Back to portfolio
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="case-hero">
+  <p class="eyebrow">Case Study · Computer Security</p>
+  <h1 class="case-title">Learning to build securely by <em>breaking things.</em></h1>
+  <p class="case-sub">A university security course where I spent a semester attacking systems the way an adversary would: exploiting web apps, breaking cryptography, sniffing network traffic, and then building the defenses that catch those same attacks. It is the clearest reason I design software with an attacker's mindset.</p>
+  <div class="case-meta">
+    <div class="meta-item"><label>Context</label><span>University of Utah, CS 4440</span></div>
+    <div class="meta-item"><label>Language</label><span>Python</span></div>
+    <div class="meta-item"><label>Scope</label><span>Offense and defense</span></div>
+    <div class="meta-item"><label>Work</label><span>Individual</span></div>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- WHY -->
+<div class="case-section">
+  <p class="section-label">Why it matters to my work</p>
+  <h2 class="section-heading">The best way to write secure code is to know how it breaks.</h2>
+  <p class="prose">In my full stack work I care a lot about getting security right: role based access enforced on the server, uploads validated by their actual contents, forms that hold up against crafted requests. This course is where that instinct comes from. Once you have written the exploit for an injection flaw or a weak token yourself, you never build the vulnerable version again, and you spot it quickly in code review.</p>
+  <p class="prose">Below is a high level tour of what I worked on. I am deliberately not sharing the exploit code or step by step attacks (see the note at the end).</p>
+</div>
+
+<hr class="full-divider">
+
+<!-- AREAS -->
+<div class="case-section">
+  <p class="section-label">What I worked on</p>
+  <h2 class="section-heading">Four areas, offense and defense.</h2>
+  <div class="area-grid">
+
+    <div class="area-card">
+      <div class="area-icon">🌐</div>
+      <span class="area-tag">Web application security</span>
+      <h4>Exploiting the OWASP Top 10</h4>
+      <p>Hands on work with the most common classes of web vulnerability, attacking a deliberately vulnerable application to understand exactly how each one works.</p>
+      <ul class="area-list">
+        <li>SQL injection, including automating the discovery of injectable inputs</li>
+        <li>Cross-site scripting (XSS)</li>
+        <li>Cross-site request forgery (CSRF)</li>
+      </ul>
+    </div>
+
+    <div class="area-card">
+      <div class="area-icon">🔑</div>
+      <span class="area-tag">Applied cryptography</span>
+      <h4>Breaking real cryptographic schemes</h4>
+      <p>The toughest part of the course: attacking cryptography not by guessing keys, but by exploiting how the schemes are built and used.</p>
+      <ul class="area-list">
+        <li>An RSA padding oracle attack (Bleichenbacher)</li>
+        <li>A hash length extension attack to forge a signed request</li>
+        <li>Hash collisions, and classical cryptanalysis using letter frequency and chi-squared analysis</li>
+      </ul>
+    </div>
+
+    <div class="area-card">
+      <div class="area-icon">📡</div>
+      <span class="area-tag">Network security</span>
+      <h4>Reading what crosses the wire</h4>
+      <p>Parsing raw network traffic to see what older, cleartext protocols leak, and why encryption in transit matters.</p>
+      <ul class="area-list">
+        <li>Packet parsing from scratch</li>
+        <li>Capturing credentials sent in the clear (for example FTP and IMAP)</li>
+      </ul>
+    </div>
+
+    <div class="area-card">
+      <div class="area-icon">🛡️</div>
+      <span class="area-tag">Detection and defense</span>
+      <h4>Catching the attack, not just launching it</h4>
+      <p>For every network attack, I also built the detection side: watching a stream of traffic and flagging the malicious pattern. Thinking about both halves is what made the ideas stick.</p>
+      <ul class="area-list">
+        <li>Signature and anomaly style detection of the attacks above</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="chips">
+    <span class="chip">SQL injection</span>
+    <span class="chip">XSS</span>
+    <span class="chip">CSRF</span>
+    <span class="chip">RSA padding oracle</span>
+    <span class="chip">Hash length extension</span>
+    <span class="chip">Cryptanalysis</span>
+    <span class="chip">Packet analysis</span>
+    <span class="chip">Intrusion detection</span>
+    <span class="chip">Python</span>
+  </div>
+</div>
+
+<hr class="full-divider">
+
+<!-- TAKEAWAYS -->
+<div class="takeaway-section">
+  <div class="takeaway-inner">
+    <p class="section-label">What I took away</p>
+    <h2 class="section-heading">Security is a way of thinking, not a checklist.</h2>
+    <div class="takeaway-grid">
+      <div class="takeaway-card">
+        <div class="takeaway-num">01</div>
+        <h4>Trust nothing from the outside</h4>
+        <p>Every input, header, token, and file is something an attacker controls. I validate on the server, because that is the only place a control actually holds.</p>
+      </div>
+      <div class="takeaway-card">
+        <div class="takeaway-num">02</div>
+        <h4>Crypto fails at the edges</h4>
+        <p>The attacks rarely break the math. They exploit padding, reuse, and how a scheme is wired into an app. That shapes how carefully I treat tokens and sessions.</p>
+      </div>
+      <div class="takeaway-card">
+        <div class="takeaway-num">03</div>
+        <h4>Defense needs the attacker's view</h4>
+        <p>Building detection right after the attack taught me that you can only defend what you understand how to break.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DISCLOSURE NOTE -->
+<div class="case-section" style="padding-bottom: 2rem;">
+  <div class="note-box">
+    <h4>A note on why there's no code here</h4>
+    <p>This was an offensive security course, so the deliverables were working exploits against a target environment built for the class. I keep that code private, out of respect for academic integrity (these assignments are reused) and good security practice (working exploits should not be posted publicly). I am always happy to talk through the concepts and my approach in an interview.</p>
+  </div>
+</div>
+
+<div class="back-section">
+  <a href="index.html#work" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+    Back to all projects
+  </a>
+</div>
+
+</body>
+</html>
