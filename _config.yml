@@ -1,3 +1,4 @@
 exclude:
   - "Chat Application/"
+  - "Grading App/"
   - "node_modules/"

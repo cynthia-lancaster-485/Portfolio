@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<link rel="stylesheet" href="/static/main.css">
+{% include 'header.html' with title="Assignments" %}
+<div class="main-content">
+        <div class="hw-head">
+            <div class="heading">{{ assignment.title }}</div>
+            <div class="line"></div>
+            <p>Due {{ assignment.deadline | date:"F d" }}, total of {{ assignment.points }} point{{ assignment.points|pluralize }}</p>
+        </div>
+    
+        <div class="spacing"></div>
+
+        {% if user_type == 'student' %}
+        <div class="blue-bkgrd">
+            <p>{{status}}</p>
+                {% if user_submission %}
+                    <p><a href="{{ user_submission.file.url }}">Download your submission</a></p>
+                {% endif %}
+                {% if not overdue %}
+                    <form class="submission-form" action="/{{ assignment.id }}/" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" name="submission_file" accept="application/pdf" required>
+                        {% if error %}
+                        <output class="error-msg">{{ error }}</output>
+                        {% endif %}
+                        <button type="submit">Upload</button>
+                    </form>
+                {% endif %}          
+        </div>
+        
+        <div class="spacing"></div>
+
+        {% elif user_type == 'ta' or user_type == 'admin' %}
+        <div class="blue-bkgrd">
+                <p>Currently {{ total_submissions }}/{{ total_students }} submission{{ total_students|pluralize }}</p>
+                {% if user_type == 'ta' %}
+                <p>{{ subs_grader }} submission{{ subs_grader|pluralize }} assigned to you</p>
+                {% endif %}
+                <a class="profile" href="/{{ assignment.id }}/submissions">Grade</a>
+        </div>
+        {% endif %}
+        
+        <div>
+            <div class="spacing"></div>
+            <h4>Description</h4>
+            <div class="spacing"></div>
+            {{ assignment.description | safe}}
+        </div>
+    </div>
