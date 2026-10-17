@@ -7,12 +7,39 @@ django.setup()
 from django.core.files.base import ContentFile
 from grades.models import User, Group, Assignment, Submission
 
+# The course calendar is from Fall 2024. Shift every deadline so the demo
+# always has some assignments past due and some still open, whenever it runs.
+SEMESTER_NOW = datetime.datetime(2024, 11, 1, tzinfo=datetime.timezone.utc)
+SHIFT = datetime.datetime.now(datetime.timezone.utc) - SEMESTER_NOW
+
 def midnight(month, day):
     if month < 11 or month == 11 and day < 3:
         tz = datetime.timezone(datetime.timedelta(hours=-6), "MDT")
     else:
         tz = datetime.timezone(datetime.timedelta(hours=-7), "MST")
-    return datetime.datetime(2024, month, day, 11, 59, 59, 999999, tz)
+    return datetime.datetime(2024, month, day, 11, 59, 59, 999999, tz) + SHIFT
+
+def sample_pdf(text):
+    """Build a tiny one page PDF so sample submissions pass the PDF checks."""
+    text = text.replace("\\", "").replace("(", "").replace(")", "")
+    stream = f"BT /F1 18 Tf 72 720 Td ({text}) Tj ET".encode()
+    objects = [
+        b"<< /Type /Catalog /Pages 2 0 R >>",
+        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>",
+        b"<< /Length " + str(len(stream)).encode() + b" >>\nstream\n" + stream + b"\nendstream",
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+    ]
+    out = b"%PDF-1.4\n"
+    offsets = []
+    for number, body in enumerate(objects, start=1):
+        offsets.append(len(out))
+        out += f"{number} 0 obj\n".encode() + body + b"\nendobj\n"
+    xref = len(out)
+    out += f"xref\n0 {len(objects) + 1}\n0000000000 65535 f \n".encode()
+    out += b"".join(f"{offset:010d} 00000 n \n".encode() for offset in offsets)
+    out += f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n".encode()
+    return out
 
 def check_has_data():
     return Group.objects.all().count() or \
@@ -333,21 +360,21 @@ pages for the grading application:</p>
         assignment=hw0,
         author=s1,
         grader=ta1,
-        file=ContentFile("Github username for Alice Algorithm", name="a.txt"),
+        file=ContentFile(sample_pdf("Github username for Alice Algorithm"), name="a.pdf"),
         score = 1.0,
     )
     Submission.objects.create(
         assignment=hw0,
         author=s2,
         grader=ta2,
-        file=ContentFile("Github username for Ben Bitdiddle", name="b.txt"),
+        file=ContentFile(sample_pdf("Github username for Ben Bitdiddle"), name="b.pdf"),
         score = 1.0,
     )
     Submission.objects.create(
         assignment=hw0,
         author=s3,
         grader=ta1,
-        file=ContentFile("Github username for Cody Coder", name="c.txt"),
+        file=ContentFile(sample_pdf("Github username for Cody Coder"), name="c.pdf"),
         score = None,
     )
 
@@ -355,20 +382,20 @@ pages for the grading application:</p>
         assignment=hw1,
         author=s1,
         grader=ta1,
-        file=ContentFile("HW1 for Alice Algorithm", name="a1.txt"),
+        file=ContentFile(sample_pdf("HW1 for Alice Algorithm"), name="a1.pdf"),
         score = 93.0,
     )
     Submission.objects.create(
         assignment=hw1,
         author=s2,
         grader=ta2,
-        file=ContentFile("HW1 for Ben Bitdiddle", name="b1.txt"),
+        file=ContentFile(sample_pdf("HW1 for Ben Bitdiddle"), name="b1.pdf"),
     )
     Submission.objects.create(
         assignment=hw2,
         author=s1,
         grader=ta1,
-        file=ContentFile("HW2 for Alice Algorithm", name="c2.txt"),
+        file=ContentFile(sample_pdf("HW2 for Alice Algorithm"), name="c2.pdf"),
     )
 
 if __name__ == "__main__":

@@ -1,46 +1,123 @@
-<<<<<<< HEAD
-# assignment0-CynthiaLancaster4859
-=======
-Your assignment repository
-==========================
+# Django Grading App
 
-Please use this repository to hold all of your work for CS 3550
-web dev 1. You will submit your assigments, and they will be graded,
-using the contents of this repository only, at the commit
-corresponding to the latest possible submission time (including
-all granted extensions).
+A course gradebook where students upload PDF assignments, teaching assistants grade them, and an instructor oversees everything. I built it in Python and Django over a semester in CS 3550 (Web Software Development I) at the University of Utah, deployed it to AWS, and later came back to fix bugs and add automated tests.
 
-This repository is private. You should not be able to view another
-student's repository and they should not be able to view yours.
+**Stack:** Python, Django 5, SQLite, Django templates, JavaScript (ES modules), jQuery, HTML, CSS
+**Originally deployed on:** AWS EC2 (Ubuntu), NGINX reverse proxy, custom domain, HTTPS with Let's Encrypt
 
-Initial contents
-----------------
+<!-- Add screenshots here, for example:
+![Student gradebook with the what if calculator](docs/profile.png)
+![TA grading page with validation errors](docs/grading.png)
+-->
 
-There's a folder in this repository called `.github`. This folder
-defines the autotester. Do not modify any files in it.
+## What it does
 
-There's also a file in this repository called `.gitignore`. This file
-tells `git` not to commit certain files; it's been pre-filled with
-some Python defaults but you can edit it if you notice junk files
-being committed to your repository.
+**Three roles, three experiences**
+- **Students** see every assignment, upload a PDF before the deadline, and track their grades with a live weighted final grade.
+- **TAs** see only the submissions assigned to them and enter grades in a single form.
+- **The instructor (admin)** sees every submission and overall grading progress.
 
-Do not, under any circumstances, create a folder called `autotester`
-in the root of this repository. If you do, the autotester will break.
+**Highlights**
+- **Fair TA assignment:** each new submission goes to the TA with the fewest submissions for that assignment, chosen in a single database query (`annotate` + `Count`).
+- **Weighted grading:** graded work counts its percentage times its weight, missing work counts as zero, and ungraded or not yet due work is left out.
+- **"What if" calculator:** students can type hypothetical scores for ungraded work and watch their final grade update as they type.
+- **Accessible sortable tables:** click or press Enter on a column header to sort ascending, descending, then back to the original order. Headers expose `aria-sort` and `role="button"` for screen readers.
+- **Asynchronous uploads:** submissions upload with AJAX, the form disables while uploading, and errors from the server appear inline.
 
-Github Actions
---------------
+## Security
 
-Every time you push to this repository, it will auto-test the current
-homework assignment. The auto-test will roll over to the next week's
-assignment on the Monday after the previous assignment is due. The
-auto-tester only tests the "presubmission" component of the homework
-assignment. Passing the auto-tester doesn't mean you get full points
-on the homework!
+Security rules live in one place, the `Submission` model, so every view enforces them the same way.
 
-Github actions will email you every time you push, if you fail a test.
-This will be pretty often while you're working on the presubmission.
-That will be _very_ annoying. We recommend [turning this
-off][notification].
+- `change_grade()` only lets the assigned TA (or the admin) change a grade, even if someone crafts their own POST request.
+- `view_submission()` only lets the author, the assigned TA, or the admin download a file. Everyone else gets a 403.
+- Uploads must be PDFs: the file name must end in `.pdf` **and** the file must start with the `%PDF-` signature. The size limit (64 MiB) is checked before the file is read. Files are checked again when they are downloaded, and served as attachments with an explicit `Content-Type`.
+- Every page requires login. After logging in, the `next` redirect is only followed if it points back to this site, which prevents open redirects.
+- Grade input is validated on the server (numbers only, within the assignment's point range, real submission IDs for this assignment). Valid grades are saved and invalid ones are reported next to the right row.
+- CSRF protection on every form, including the AJAX upload.
+- Secrets and deployment settings come from environment variables, not the code.
 
-[notification]: https://docs.github.com/en/account-and-profile/managing-subscriptions-and-notifications-on-github/setting-up-notifications/about-notifications
->>>>>>> 5d62228243408328ee8cec6c838b6d40075fe686
+## Run it locally
+
+You need Python 3.11 or newer.
+
+```bash
+git clone https://github.com/cynthia-lancaster-485/django-grading-app.git
+cd django-grading-app
+python3 -m venv .venv
+source .venv/bin/activate        # on Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+
+python3 manage.py migrate
+python3 makedata.py              # loads sample users, assignments, and submissions
+python3 manage.py runserver
+```
+
+Open http://localhost:8000 and log in with any sample account. Each password is the same as the username.
+
+| Role | Username |
+| --- | --- |
+| Instructor (admin) | `pavpan` |
+| TAs | `g`, `h` |
+| Students | `a`, `b`, `c`, `d` |
+
+## Tests
+
+```bash
+python3 manage.py test grades
+```
+
+21 tests cover login and redirects, upload validation, file permissions, TA assignment, grade validation (including crafted requests), and the weighted grade calculation. They run automatically on every push with GitHub Actions.
+
+## Deployment
+
+For the course I deployed the app to an Ubuntu EC2 instance on AWS:
+
+- Elastic IP and a custom domain with DNS A records
+- NGINX as a reverse proxy to Django, also serving static files directly
+- HTTPS certificates from Let's Encrypt through Certbot
+- Production settings with `DEBUG` off and restricted allowed hosts
+
+For a longer lived deployment I would run Django under an application server such as Gunicorn, managed by systemd, instead of Django's development server.
+
+Settings read from the environment:
+
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `DJANGO_SECRET_KEY` | Secret key | development only value |
+| `DJANGO_DEBUG` | `true` or `false` | `true` |
+| `DJANGO_ALLOWED_HOSTS` | Comma separated host names | `localhost,127.0.0.1` |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | Comma separated origins, for example `https://example.com` | none |
+
+## Project structure
+
+```
+cs3550/          Django project settings and URL routes
+grades/
+  models.py      Assignment and Submission models, plus the security rules
+  views.py       Pages, form handling, validation, grade math
+  templates/     Django templates (shared header include)
+  tests.py       Automated tests
+static/
+  main.js        Sorting, async upload, and the what if calculator
+  main.css       Styles
+makedata.py      Sample data
+```
+
+## Changes since the course
+
+The first commit is the code as I submitted it in Fall 2024. When I revisited it I found and fixed several bugs, which you can see in the commit history:
+
+- Saving grades crashed because a helper function had a view decorator on it.
+- New uploads crashed because of an incorrect filter in the TA assignment query.
+- Failed upload checks showed an error but still saved the file.
+- The admin was locked out of the grading page.
+- Percentages used an assignment's weight instead of its points.
+- Several JavaScript fixes: an undefined CSRF token, restoring the original sort order, and the what if calculator replacing table cells instead of their contents.
+
+I also added the automated tests and CI, moved secrets into environment variables, and replaced the class's git submodule for jQuery with a vendored copy (jQuery 4.0.0, MIT license, in `static/vendor/`).
+
+## What I learned
+
+- **Security is mostly about where you put the rules.** Keeping permission checks in model methods meant the same rule protected the page, the form, and the file download.
+- **Never trust the browser.** Every limit in the HTML (input ranges, accepted file types) is repeated on the server, because anyone can edit a form or send their own request.
+- **Tests change how you see your own code.** Writing tests for this project is what surfaced bugs that the class autograder never checked.
