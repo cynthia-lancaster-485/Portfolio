@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<link rel="stylesheet" href="/static/main.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% include 'header.html' with title="Profile" %}
+<div class="main-content">
+    <div class="details">
+        <div>
+            <div class="heading">
+                Your grades
+            </div>
+            <div class="line"></div>
+        </div>
+    
+        <div class="spacing"></div>
+    
+        <div class="blue-bkgrd">
+            Currently logged in as {{ user }}  &emsp;  &emsp;<a class="profile" href="/profile/logout/"> Log Out</a>
+        </div>
+    
+        <div class="spacing"></div>
+    
+            {% if user_type == 'ta' or user_type == 'admin' %}
+                <table class="profile-tbl sortable">
+                    <thead>
+                        <th style="width: 80%;">Assignment</th>
+                        <th style="width: 20%;" class="sort-column">Graded</th>
+                    </thead>
+                    <tbody>
+                        {% for data in assignment_data %}
+                            <tr data-index="{{forloop.counter}}">
+                                <td>{{ data.assignment.title }}</td>
+                                <td>{{ data.graded_submissions }}/{{ data.submissions_assigned}} </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+            {% if user_type == 'student' %}
+                <table class="profile-tbl sortable" id="hypoTable">
+                    <thead>
+                        <th style="width: 80%;">Assignment</th>
+                        <th style="width: 20%;" class="sort-column">Graded</th>
+                    </thead>
+                    <tbody>
+                        {% for data in assignment_data %}
+                            <tr data-index="{{forloop.counter}}">
+                                <td><a href="/{{ data.assignment.id }}">{{ data.assignment.title }}</a></td>
+                                <td data-weight="{{data.assignment.weight}}" data-value="{{ data.score }}">{{ data.score }}</td>
+                            </tr>
+                        {% endfor %}    
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td><strong>Final Grade</strong></td>
+                            <td style="text-align: right;" class="final-grade">{{ final_grade|floatformat:2  }}%</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            {% endif %}
+            <div class="spacing"></div>
+    </div>
+</div>
+
+
+
+

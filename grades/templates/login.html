@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="stylesheet" href="/static/main.css">
+{% include 'header.html' with title="Login" %}
+
+<div class="main-content">
+    <div class="heading">
+        Login
+    </div>
+    <div class="line"></div>
+
+    <div class="spacing"></div>
+
+    <form action="/profile/login/" method="post">
+       {% csrf_token %}
+        <div class="login">
+            <label for="username" class="login-left">Username:</label>
+            <input type="text" id="username" name="username" autofocus class="login-right"><br><br>
+        </div>
+        <div class="login">
+            <label for="password" class="login-left">Password:</label>
+            <input type="password" id="password" name="password" class="login-right"><br><br>
+        </div>
+        <input type="hidden" name="next" value="{{ next }}">
+        <div class="spacing"></div>
+        <div class="submit">
+            <button type="submit" class="login-btn">Login</button>
+        </div>
+    </form>
+    <div class="spacing"></div>
+</div>

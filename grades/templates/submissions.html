@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<link rel="stylesheet" href="/static/main.css">
+{% include 'header.html' with title="Submissions" %}
+<div class="main-content">
+    <div>
+        <div class="heading">Homework 1 (HTML)</div>
+        <div class="line"></div>
+        <div>All grades out of {{ assignment.points }}</div>
+    </div>
+
+    <div class="spacing"></div>
+
+    {% if errors %}
+        {% for submission.id, errors in errors.items %}
+                <output class="error-msg">{{ errors.0 }}</output>
+        {% endfor %}
+    {% endif %}
+
+    <table class="table-size sortable">
+        <thead>
+            <th style="width: 30%;">Student</th>
+            <th>Submission</th>
+            <th>Grade</th>
+        </thead>
+        <tbody>
+            <form action="/{{ assignment.id }}/submissions" method="post">
+            {% for submission in submissions %}
+                <tr data-index ="{{forloop.counter}}">
+                    <td>{{ submission.author.get_full_name }}</td>
+                    <td><a href="{{ submission.file.url }}">Submission</a></td>
+                    <td>
+                            <input type="number" id="grade" step="0.01" value="{{submission.score}}" name="grade-{{ submission.id }}" 
+                            class="{% if errors and submission.id in errors %}error-border{% endif %}" min="0" max="{{ assignment.points }}">
+                    </td>
+                    <td>
+                    
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="spacing"></div>
+    <div>
+            {% csrf_token %}
+            <input type="submit" value="Submit" style="font-size: 100%;" name="grade-{{ submission.id }}">
+            <a href="/{{ assignment.id }}">Back to assignment</a>
+    </div>
+    </form>
+    <div class="spacing"></div>
+    
+</div>
+

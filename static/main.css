@@ -1,0 +1,209 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+
+* { font-family: "IBM Plex Sans", sans-serif;
+    line-height: 1.25;
+    }
+
+code {
+    font-family: "IBM Plex Mono", sans-serif ;
+}
+
+.nav-bar {
+    font-size: 125%;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.5rem 1rem 1rem;
+    gap: 1rem;
+    max-width: 50rem;
+    margin: 0 auto;
+
+}
+
+.profile {
+    align-items: left;
+}
+
+.nav-div {
+    background-color: #ddd;
+    width: 100%;
+    margin: auto;
+    box-shadow: 0px 0px 5px gray;
+}
+
+
+.nav-bar a {
+    color: #444;
+    text-decoration: none;
+}
+
+.nav-bar a:hover {
+    color: #444;
+    text-decoration: underline;
+}
+
+.title {
+    font-size: 150%;
+}
+
+.login-btn {
+    width: 400px;
+    font-size: 125%
+}
+
+
+.line {
+    height: 1px;
+    color: #ddd;
+    background-color: #ddd;
+    width: 100%; 
+    border-width: 0;
+}
+
+
+.details {
+    
+}
+
+.details p {
+    margin: 0 0 1rem 0;
+}
+
+.blue-bkgrd {
+    padding: 1rem 1rem 1rem 1rem;
+    background-color: #b1c3de;
+    border: 3px solid #204a87;
+    width: 94%;
+}
+.stacked {
+    display: flex;
+    flex-direction: column;
+    align-items: last baseline;
+}
+
+.submission a{
+    margin-left: auto;
+}
+.assignments {
+    
+}
+
+.sub {
+    display: flex;
+}
+
+.table-size {
+    width: 95%;
+    line-height: 1.5rem;
+}
+
+
+.profile-tbl {
+    width: 95%;
+
+}
+
+.profile-tbl tbody td:nth-child(2) {
+    text-align: right;
+}
+
+.profile-tbl thead th:nth-child(2) {
+    text-align: right;
+}
+.profile-tbl th {
+    text-align: left;
+}
+
+.assignments th {
+    text-align: left;
+}
+
+.assignments tbody td:nth-child(3) {
+    text-align: right;
+}
+
+.assignments thead th:nth-child(3) {
+    text-align: right;
+}
+
+.table-size th {
+    text-align: left;
+}
+
+.login-field {
+    width: 100%;
+    margin-left: auto;
+}
+.spacing {
+    margin: 1rem 0 0 0;
+}
+
+
+.submit {
+    display: flex;
+    justify-content: center;
+}
+
+.heading {
+    font-size: 150%;
+    font-weight: bold;
+    margin: 3rem 0 0 0;
+}
+.login {
+    display: flex;
+    flex-direction: row;
+}
+
+.login-left {
+    flex: 50%;
+}
+
+.login-right {
+    flex: 50%;
+    height: 20px;
+}
+
+.login input[type="text"]{
+    width: 78%;
+    padding: 0 0 0 0;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+html {
+    margin: 0;
+    padding: 0;
+}
+
+.main-content{
+    max-width: 50rem;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+@media (max-width: 52rem) {
+    .main-content {
+      flex-direction: column;
+    }
+  }
+
+.num_subs {
+    align-items: last baseline;
+
+}
+
+/** "Homework 4 changes here" **/
+output.error-msg {
+    color: red;
+    font-weight: bold;
+}
+
+input.error-border {
+    border: 2px solid red;
+}
+th.sort-column { cursor: pointer; }
+th.sort-asc::after { content: " \25b2"; }
+th.sort-desc::after { content: " \25bc"; }
