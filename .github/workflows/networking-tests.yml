@@ -1,0 +1,22 @@
+name: Networking Projects tests
+
+on:
+  push:
+    paths: ["Networking Projects/**", ".github/workflows/networking-tests.yml"]
+  pull_request:
+    paths: ["Networking Projects/**", ".github/workflows/networking-tests.yml"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: HTTP proxy tests
+        working-directory: "Networking Projects/HTTP Proxy"
+        run: python -m unittest test_proxy.py
+      - name: Reliable transport tests
+        working-directory: "Networking Projects/Reliable Transport"
+        run: python -m unittest test_protocols.py
